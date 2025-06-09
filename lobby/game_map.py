@@ -12,5 +12,9 @@ def render(screen, current_player=None):
                 current_player.rect.center = (100, 500)  # 你想要的新位置
                 current_player.resize_image((100, 100))
                 current_player.map_initialized["game_map"] = True
-            current_player.handle_input(pygame.key.get_pressed())  # 允許移動
+            else:
+                # 即使不是第一次，仍確保圖片縮放正確
+                current_player.resize_image((100, 100))
+            #current_player.handle_input(pygame.key.get_pressed())  # 允許移動
+
         current_player.draw(screen)
