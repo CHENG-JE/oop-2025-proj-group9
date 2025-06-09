@@ -71,13 +71,23 @@ def handle_events(event, player):
             item_prices = [100,150,200]
             item_names = ["Gift","Blood","Experience book"]
             price = item_prices[selected_index]
-            #要寫買了東西以後的功用
-            #
+
             if player.money >= price:
                 player.money -= price
                 purchase_message = f"Bought:{item_names[selected_index]}"
             else:
                 purchase_message = "No enough cash"
+
+            #要寫買了東西以後的功用
+            if selected_index ==  0 :
+                player.blood = 100 
+            elif selected_index == 1:
+                player.blood += 100
+            elif selected_index == 2:
+                player.exp += 50
+
+            #
+
         elif event.key == pygame.K_ESCAPE:
             player.current_map = "lobby"
 
