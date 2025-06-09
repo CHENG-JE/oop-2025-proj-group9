@@ -71,7 +71,8 @@ def handle_events(event, player):
             item_prices = [100,150,200]
             item_names = ["Gift","Blood","Experience book"]
             price = item_prices[selected_index]
-
+            #要寫買了東西以後的功用
+            #
             if player.money >= price:
                 player.money -= price
                 purchase_message = f"Bought:{item_names[selected_index]}"
