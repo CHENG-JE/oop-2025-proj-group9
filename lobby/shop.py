@@ -1,5 +1,5 @@
 import pygame
-
+import numpy as np
 # 載入背景
 background = pygame.image.load("assets/background/shop.png")
 background = pygame.transform.scale(background, (800, 600))
@@ -80,12 +80,26 @@ def handle_events(event, player):
 
             #要寫買了東西以後的功用
             if selected_index ==  0 :
-                player.blood = 100 
+                choice = np.random.rand()
+                if choice > 0.8:
+                    player.max_blood += 50
+                    player.blood = player.max_blood
+                elif choice > 0.5:
+                    player.max_blood += 20
+                    player.blood = player.max_blood
+                elif choice > 0.3:
+                    player.blood = 100
+                else:
+                    player.blood = 50
+                    player.exp = 0
             elif selected_index == 1:
+                player.max_blood += 50
                 player.blood += 100
+                player.blood = min(player.blood, player.max_blood)
             elif selected_index == 2:
                 player.exp += 50
 
+            #還差購買訊息沒補完
             #
 
         elif event.key == pygame.K_ESCAPE:

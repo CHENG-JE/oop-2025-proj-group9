@@ -252,7 +252,7 @@ def update_level2(player, screen):
 
 
     font = pygame.font.SysFont(None, 28)
-    kill_text = font.render(f"Kills: {player.kills}", True, (255, 255, 0))
+    kill_text = font.render(f"Kills: {player.kills}/40", True, (255, 255, 0))
     screen.blit(kill_text, (SCREEN_WIDTH - 120, 20))
 
 if __name__ == "__main__":

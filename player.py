@@ -33,6 +33,7 @@ class Player:
             ]
         self.current_trigger_info = None
         self.money = 500 # 初始金額
+        self.max_blood = 100
         self.blood = 100 #初始血量
         self.exp = 0 #初始經驗值
         self.map_initialized = {
@@ -83,7 +84,7 @@ class Player:
         screen.blit(money_text, (20, 20))  # 左上角座標
         
         blood_font = pygame.font.SysFont(None, 28)
-        blood_text = blood_font.render(f"Blood: {self.blood}/100", True, (250, 250, 250))  # 黃色金額
+        blood_text = blood_font.render(f"Blood: {self.blood}/{self.max_blood}", True, (250, 250, 250))  # 黃色金額
         screen.blit(blood_text, (20, 40))  # 左上角座標
 
         exp_font = pygame.font.SysFont(None, 28)
