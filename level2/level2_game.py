@@ -118,15 +118,18 @@ def update_level2(player, screen):
                 player.blood -= 5
             enemy.kill()
             if player.blood <= 0:
+                #玩家輸了
                 print("Player defeated")
                 screen.fill((0, 0, 0))
                 font = pygame.font.SysFont(None, 48)
                 line1 = font.render(f"You were defeated. Total kills: {player.kills}", True, (255, 0, 0))
-                line2 = font.render("Press L to leave!", True, (255, 0, 0))
+                line2 = font.render(f"You lose $100 & all EXP", True, (255, 0, 0))
+                line3 = font.render("    Press L to leave!", True, (255, 0, 0))
 
                 # 顯示兩行文字，第二行往下偏移約 50 px
                 screen.blit(line1, (SCREEN_WIDTH // 2 - line1.get_width() // 2, SCREEN_HEIGHT // 2 - 40))
                 screen.blit(line2, (SCREEN_WIDTH // 2 - line2.get_width() // 2, SCREEN_HEIGHT // 2 + 10))
+                screen.blit(line3, (SCREEN_WIDTH // 2 - line2.get_width() // 2, SCREEN_HEIGHT // 2 + 60))
                 pygame.display.flip()
 
                 waiting = True
@@ -142,6 +145,7 @@ def update_level2(player, screen):
                             player.resize_image((100, 100))
                             player.blood = 100
                             player.exp = 0
+                            player.money -=100
                             player.kills = 0
                             waiting = False
                             return
@@ -184,15 +188,18 @@ def update_level2(player, screen):
     for hit in hits:
         player.blood -= 10
         if player.blood <= 0:
+            #玩家輸了
             print("Player defeated")
             screen.fill((0, 0, 0))
             font = pygame.font.SysFont(None, 48)
             line1 = font.render(f"You were defeated. Total kills: {player.kills}", True, (255, 0, 0))
-            line2 = font.render("Press L to leave!", True, (255, 0, 0))
+            line2 = font.render(f"You lose $100 & all EXP", True, (255, 0, 0))
+            line3 = font.render("    Press L to leave!", True, (255, 0, 0))
 
             # 顯示兩行文字，第二行往下偏移約 50 px
             screen.blit(line1, (SCREEN_WIDTH // 2 - line1.get_width() // 2, SCREEN_HEIGHT // 2 - 40))
             screen.blit(line2, (SCREEN_WIDTH // 2 - line2.get_width() // 2, SCREEN_HEIGHT // 2 + 10))
+            screen.blit(line3, (SCREEN_WIDTH // 2 - line2.get_width() // 2, SCREEN_HEIGHT // 2 + 60))
             pygame.display.flip()
 
             waiting = True
@@ -207,20 +214,24 @@ def update_level2(player, screen):
                         player.rect.center = (460, 170)  # 設定指定位置
                         player.resize_image((100, 100))  # 根據需要重新縮放圖片
                         player.blood = 100
+                        player.money -=100
                         player.exp = 0
                         player.kills = 0
                         waiting = False
                         return
-    
+                    
+    #玩家贏了
     if player.kills == 40 :
         screen.fill((0, 0, 0))
         font = pygame.font.SysFont(None, 48)
         line1 = font.render(f"Victory! Total kills: {player.kills}", True, (255, 0, 0))
-        line2 = font.render("Press L to leave!", True, (255, 0, 0))
+        line2 = font.render(f"You got $1000 & 100EXP", True, (255, 0, 0))
+        line3 = font.render("    Press L to leave!", True, (255, 0, 0))
 
         # 顯示兩行文字，第二行往下偏移約 50 px
         screen.blit(line1, (SCREEN_WIDTH // 2 - line1.get_width() // 2, SCREEN_HEIGHT // 2 - 40))
         screen.blit(line2, (SCREEN_WIDTH // 2 - line2.get_width() // 2, SCREEN_HEIGHT // 2 + 10))
+        screen.blit(line3, (SCREEN_WIDTH // 2 - line2.get_width() // 2, SCREEN_HEIGHT // 2 + 60))
         pygame.display.flip()
 
         waiting = True
@@ -235,7 +246,10 @@ def update_level2(player, screen):
                     player.rect.center = (460, 170)  # 設定指定位置
                     player.resize_image((100, 100))  # 根據需要重新縮放圖片
                     player.blood = player.blood
-                    player.exp += 100
+                    if player.exp <= 900:
+                        player.exp += 100
+                    else:
+                        player.exp = 1000
                     player.money += 1000
                     player.kills = 0
                     waiting = False

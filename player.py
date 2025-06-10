@@ -84,11 +84,11 @@ class Player:
         screen.blit(money_text, (20, 20))  # 左上角座標
         
         blood_font = pygame.font.SysFont(None, 28)
-        blood_text = blood_font.render(f"Blood: {self.blood}/{self.max_blood}", True, (250, 250, 250))  # 黃色金額
+        blood_text = blood_font.render(f"HP: {self.blood}/{self.max_blood}", True, (250, 250, 250))  # 黃色金額
         screen.blit(blood_text, (20, 40))  # 左上角座標
 
         exp_font = pygame.font.SysFont(None, 28)
-        exp_text = exp_font.render(f"Exp: {self.exp}/1000", True, (250, 250, 250))  # 黃色金額
+        exp_text = exp_font.render(f"EXP: {self.exp}/1000", True, (250, 250, 250))  # 黃色金額
         screen.blit(exp_text, (20, 60))  # 左上角座標
 
     def can_move_to(self, dx, dy):
