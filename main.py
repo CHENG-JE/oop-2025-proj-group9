@@ -1,9 +1,10 @@
 import pygame
 import os
 from player import Player
-from log_in import show_login_screen
-import shop
-import game_map
+from lobby.log_in import show_login_screen
+import lobby.shop as shop
+import lobby.game_map as game_map
+import level2.level2_game as level2_game
 
 # 初始化
 pygame.init()
@@ -48,6 +49,57 @@ while running:
         shop.render(screen, current_player)
     elif current_player.current_map == "game_map":
         game_map.render(screen, current_player)
+
+        # 進入level1
+        zone_rect = pygame.Rect(105, 430, 120, 100)  # 將高度由 0 改為 100
+        if zone_rect.collidepoint(current_player.rect.center):
+            font = pygame.font.SysFont(None, 36)
+            text = font.render("Press Enter to start the game", True, (255, 255, 255))
+            # 將提示顯示邏輯放在地圖繪製之後
+            screen.blit(text, (300, 550))
+
+            keys = pygame.key.get_pressed()
+            if keys[pygame.K_RETURN]:
+                # 更換玩家圖片與切換關卡
+                current_player.image = pygame.image.load("assets/player/fighter.png")
+                current_player.image = pygame.transform.scale(current_player.image, current_player.image_size)
+                level2_game.init_level2(current_player)
+                current_player.current_map = "level1"
+
+        # level2
+        zone_rect = pygame.Rect(600, 200, 120, 100)  # 將高度由 0 改為 100
+        if zone_rect.collidepoint(current_player.rect.center):
+            font = pygame.font.SysFont(None, 36)
+            text = font.render("Press Enter to start the game", True, (255, 255, 255))
+            # 將提示顯示邏輯放在地圖繪製之後
+            screen.blit(text, (300, 550))
+
+            keys = pygame.key.get_pressed()
+            if keys[pygame.K_RETURN]:
+                # 更換玩家圖片與切換關卡
+                current_player.image = pygame.image.load("assets/player/fighter.png")
+                current_player.image = pygame.transform.scale(current_player.image, current_player.image_size)
+                level2_game.init_level2(current_player)
+                current_player.current_map = "level2"
+        
+        # level3
+        zone_rect = pygame.Rect(384, 150, 120, 100)  # 將高度由 0 改為 100
+        if zone_rect.collidepoint(current_player.rect.center):
+            font = pygame.font.SysFont(None, 36)
+            text = font.render("Press Enter to start the game", True, (255, 255, 255))
+            # 將提示顯示邏輯放在地圖繪製之後
+            screen.blit(text, (300, 550))
+
+            keys = pygame.key.get_pressed()
+            if keys[pygame.K_RETURN]:
+                # 更換玩家圖片與切換關卡
+                current_player.image = pygame.image.load("assets/player/fighter.png")
+                current_player.image = pygame.transform.scale(current_player.image, current_player.image_size)
+                level2_game.init_level2(current_player)
+                current_player.current_map = "level2"
+
+    elif current_player.current_map == "level2":
+        level2_game.update_level2(current_player, screen)
     else:
         screen.blit(background, (0, 0))
         current_player.draw(screen)

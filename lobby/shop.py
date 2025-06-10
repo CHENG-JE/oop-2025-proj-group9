@@ -1,5 +1,5 @@
 import pygame
-
+import numpy as np
 # 載入背景
 background = pygame.image.load("assets/background/shop.png")
 background = pygame.transform.scale(background, (800, 600))
@@ -50,6 +50,14 @@ def render(screen, player):
     money_text = money_font.render(f"Money: ${player.money}", True, (255, 255, 255))
     screen.blit(money_text, (20, 20))
 
+    blood_font = pygame.font.SysFont(None, 28)
+    blood_text = blood_font.render(f"HP: {player.blood}/{player.max_blood}", True, (255, 255, 255))
+    screen.blit(blood_text, (20, 40))
+
+    exp_font = pygame.font.SysFont(None, 28)
+    exp_text = exp_font.render(f"EXP: {player.exp}/1000", True, (255, 255, 255))
+    screen.blit(exp_text, (20, 60))
+
 
     # 顯示購買訊息
     if purchase_message:
@@ -71,13 +79,46 @@ def handle_events(event, player):
             item_prices = [100,150,200]
             item_names = ["Gift","Blood","Experience book"]
             price = item_prices[selected_index]
-            #要寫買了東西以後的功用
-            #
+
             if player.money >= price:
                 player.money -= price
-                purchase_message = f"Bought:{item_names[selected_index]}"
+                # 根據購買項目給予不同訊息
+                if selected_index == 0:
+                    choice = np.random.rand()
+                    if choice > 0.8:
+                        player.max_blood += 50
+                        player.blood = player.max_blood
+                        purchase_message = "Bought Gift: Max HP +50 & Fully healed!"
+                    elif choice > 0.5:
+                        player.max_blood += 20
+                        player.blood = player.max_blood
+                        purchase_message = "Bought Gift: Max HP +20 & Fully healed!"
+                    elif choice > 0.3:
+                        player.blood = 100
+                        purchase_message = "Bought Gift: HP restored to 100."
+                    else:
+                        player.blood = 50
+                        player.exp = 0
+                        purchase_message = "Bought Gift: Bad luck... HP=50 and Reset everything."
+                        
+                elif selected_index == 1:
+                    player.blood += 50
+                    player.blood = min(player.blood, player.max_blood)
+                    purchase_message = "Bought Blood Pack: HP +50"
+
+                elif selected_index == 2:
+                    player.exp += 50
+                    player.money += 1000
+                    purchase_message = "Bought XP Book: EXP +50"
+                #purchase_message = f"Bought:{item_names[selected_index]}"
             else:
                 purchase_message = "No enough cash"
+
+            # 已根據購買項目給予效果，避免重複處理
+
+            #還差購買訊息沒補完
+            #
+
         elif event.key == pygame.K_ESCAPE:
             player.current_map = "lobby"
 

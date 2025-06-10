@@ -2,6 +2,8 @@ import pygame
 
 class Player:
     def __init__(self, image_path, position, size=(150, 150)):
+        self.image_size = size
+        self.original_image_path = image_path  # 儲存初始圖片路徑
         self.image = pygame.image.load(image_path).convert_alpha()
         self.image = pygame.transform.scale(self.image, size)
         self.rect = self.image.get_rect()
@@ -18,14 +20,22 @@ class Player:
                 pygame.Rect(270,390,60,100),
                 pygame.Rect(380,500,500,100),
                 pygame.Rect(270,500,500,100)
+            ],
+            "level2":[
+
             ]
+
         }
-        self.trigger_areas = [
-            {"rect": pygame.Rect(98, 405, 97, 50), "message": "Do you want to buy something?", "pos": (20, 150), "target": "shop"},
-            {"rect": pygame.Rect(497, 320, 123, 20), "message": "Play the game NOW!", "pos": (440, 40), "target": "game_map"}
-        ]
+        if self.current_map == "lobby":
+            self.trigger_areas = [
+                {"rect": pygame.Rect(98, 405, 97, 50), "message": "Do you want to buy something?", "pos": (20, 150), "target": "shop"},
+                {"rect": pygame.Rect(497, 320, 123, 20), "message": "Play the game NOW!", "pos": (440, 40), "target": "game_map"}
+            ]
         self.current_trigger_info = None
-        self.money = 500  # 初始金額
+        self.money = 500 # 初始金額
+        self.max_blood = 100
+        self.blood = 100 #初始血量
+        self.exp = 0 #初始經驗值
         self.map_initialized = {
             "lobby": False,
             "game_map": False
@@ -51,7 +61,7 @@ class Player:
         if self.current_map == "lobby":
             speed = 5
         else: 
-            speed = 2
+            speed = 5
         if keys[pygame.K_a] and self.can_move_to_dx(-5) and self.rect.left > -50:
             self.rect.x -= speed
         if keys[pygame.K_d] and self.can_move_to_dx(5) and self.rect.right < 850:
@@ -72,6 +82,14 @@ class Player:
         money_font = pygame.font.SysFont(None, 28)
         money_text = money_font.render(f"Money: ${self.money}", True, (250, 250, 250))  # 黃色金額
         screen.blit(money_text, (20, 20))  # 左上角座標
+        
+        blood_font = pygame.font.SysFont(None, 28)
+        blood_text = blood_font.render(f"HP: {self.blood}/{self.max_blood}", True, (250, 250, 250))  # 黃色金額
+        screen.blit(blood_text, (20, 40))  # 左上角座標
+
+        exp_font = pygame.font.SysFont(None, 28)
+        exp_text = exp_font.render(f"EXP: {self.exp}/1000", True, (250, 250, 250))  # 黃色金額
+        screen.blit(exp_text, (20, 60))  # 左上角座標
 
     def can_move_to(self, dx, dy):
         future_rect = self.rect.move(dx, dy)
@@ -93,8 +111,18 @@ class Player:
                 if area["rect"].collidepoint(self.rect.center):
                     return area.get("target")
         return False
+    def reset_image(self):
+        self.image = pygame.image.load(self.original_image_path).convert_alpha()
+        self.image = pygame.transform.scale(self.image, self.image_size)
+        center = self.rect.center
+        self.rect = self.image.get_rect()
+        self.rect.center = center
+
     def resize_image(self, size):
         self.image = pygame.transform.scale(self.image, size)
         center = self.rect.center
         self.rect = self.image.get_rect()
         self.rect.center = center
+    def update(self):
+    # 預留未來動畫或狀態更新用，目前不做任何事
+        pass
