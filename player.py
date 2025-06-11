@@ -25,17 +25,19 @@ class Player:
             "level2":[
 
             ]
+            #"level1":[] 如果有需要的話可以自己打上去
+            #"level3":[]
 
         }
         if self.current_map == "lobby":
             self.trigger_areas = [
                 {"rect": pygame.Rect(60, 405, 110, 50), "message": "Do you want to buy something?", "pos": (20, 150), "target": "shop"},
                 {"rect": pygame.Rect(490, 315, 150, 50), "message": "Play the game NOW!", "pos": (440, 40), "target": "game_map"},
-                {"rect": pygame.Rect(715, 425, 80, 50), "message": "Exit Game?", "pos": (635, 320), "target": "exit"}
+                {"rect": pygame.Rect(655, 425, 200, 50), "message": "Exit Game?", "pos": (635, 320), "target": "exit"}
             ]
         self.current_trigger_info = None
         self.money = 500 # 初始金額
-        
+
         self.max_blood = 100
         self.blood = 100 #初始血量
         self.exp = 0 #初始經驗值

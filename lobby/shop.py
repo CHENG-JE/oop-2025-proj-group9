@@ -108,7 +108,7 @@ def handle_events(event, player):
 
                 elif selected_index == 2:
                     player.exp += 50
-                    player.money += 1000
+                    #player.money += 1000 #需要測試時再取消註解
                     purchase_message = "Bought XP Book: EXP +50"
                 #purchase_message = f"Bought:{item_names[selected_index]}"
             else:

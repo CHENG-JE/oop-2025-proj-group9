@@ -169,7 +169,7 @@ def update_level2(player, screen):
                 enemy.kill()
                 player.kills += 1
                 if player.kills % 10 == 0:
-                    player.blood = min(player.blood + 20, 100)
+                    player.blood = min(player.blood + 50, player.max_blood)#每擊殺10個敵人回50滴血
                 if random.random() < DROP_CHANCE:
                     # 確保 Item 類別已正確導入，若未導入請加上 import
                     item = Item(enemy.rect.center)
