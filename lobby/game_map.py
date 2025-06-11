@@ -10,7 +10,7 @@ def render(screen, current_player=None):
         if keys[pygame.K_ESCAPE]:
             current_player.resize_image((150, 150))
             current_player.map_initialized["game_map"] = False  # 讓下次進入會重設位置
-            current_player.rect.center = (100, 500)  # 你想要的新位置
+            current_player.rect.center = (570, 325)  # 你想要的新位置
             current_player.current_map = "lobby"
             return
 

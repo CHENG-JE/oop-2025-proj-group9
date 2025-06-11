@@ -29,7 +29,8 @@ class Player:
         if self.current_map == "lobby":
             self.trigger_areas = [
                 {"rect": pygame.Rect(98, 405, 97, 50), "message": "Do you want to buy something?", "pos": (20, 150), "target": "shop"},
-                {"rect": pygame.Rect(497, 320, 123, 20), "message": "Play the game NOW!", "pos": (440, 40), "target": "game_map"}
+                {"rect": pygame.Rect(497, 320, 123, 20), "message": "Play the game NOW!", "pos": (440, 40), "target": "game_map"},
+                {"rect": pygame.Rect(700, 500, 80, 50), "message": "Exit Game?", "pos": (600, 100), "target": "exit"}
             ]
         self.current_trigger_info = None
         self.money = 500 # 初始金額
@@ -73,23 +74,24 @@ class Player:
 
         self.check_trigger_area()
 
-    def draw(self, screen):
+    def draw(self, screen,show_status = True):
         screen.blit(self.image, self.rect)
         if self.current_trigger_info:
             font = pygame.font.SysFont(None, 40)
             text = font.render(self.current_trigger_info["message"], True, (220, 220, 220))
             screen.blit(text, self.current_trigger_info["pos"])
-        money_font = pygame.font.SysFont(None, 28)
-        money_text = money_font.render(f"Money: ${self.money}", True, (250, 250, 250))  # 黃色金額
-        screen.blit(money_text, (20, 20))  # 左上角座標
-        
-        blood_font = pygame.font.SysFont(None, 28)
-        blood_text = blood_font.render(f"HP: {self.blood}/{self.max_blood}", True, (250, 250, 250))  # 黃色金額
-        screen.blit(blood_text, (20, 40))  # 左上角座標
+        if show_status:
+            money_font = pygame.font.SysFont(None, 28)
+            money_text = money_font.render(f"Money: ${self.money}", True, (250, 250, 250))  # 黃色金額
+            screen.blit(money_text, (20, 20))  # 左上角座標
+            
+            blood_font = pygame.font.SysFont(None, 28)
+            blood_text = blood_font.render(f"HP: {self.blood}/{self.max_blood}", True, (250, 250, 250))  # 黃色金額
+            screen.blit(blood_text, (20, 40))  # 左上角座標
 
-        exp_font = pygame.font.SysFont(None, 28)
-        exp_text = exp_font.render(f"EXP: {self.exp}/1000", True, (250, 250, 250))  # 黃色金額
-        screen.blit(exp_text, (20, 60))  # 左上角座標
+            exp_font = pygame.font.SysFont(None, 28)
+            exp_text = exp_font.render(f"EXP: {self.exp}/1000", True, (250, 250, 250))  # 黃色金額
+            screen.blit(exp_text, (20, 60))  # 左上角座標
 
     def can_move_to(self, dx, dy):
         future_rect = self.rect.move(dx, dy)
@@ -126,3 +128,24 @@ class Player:
     def update(self):
     # 預留未來動畫或狀態更新用，目前不做任何事
         pass
+    def to_dict(self):
+        return {
+            "image_path": self.original_image_path,
+            "position": self.rect.center,
+            "image_size": self.image_size,
+            "current_map": self.current_map,
+            "money": self.money,
+            "max_blood": self.max_blood,
+            "blood": self.blood,
+            "exp": self.exp
+        }
+
+    @classmethod
+    def from_dict(cls, data):
+        player = cls(data["image_path"], data["position"], tuple(data["image_size"]))
+        player.current_map = data.get("current_map", "lobby")
+        player.money = data.get("money", 500)
+        player.max_blood = data.get("max_blood", 100)
+        player.blood = data.get("blood", 100)
+        player.exp = data.get("exp", 0)
+        return player
