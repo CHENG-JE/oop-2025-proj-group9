@@ -1,4 +1,1 @@
-[
-{"image_path": "assets/player/player1.png", "position": [715, 525], "image_size": [150, 150], "current_map": "lobby", "money": 6450, "max_blood": 260, "blood": 260, "exp": 0}, 
-{"image_path": "assets/player/player2.png", "position": [400, 500], "image_size": [150, 150], "current_map": "lobby", "money": 500, "max_blood": 100, "blood": 100, "exp": 0}
-]
+[{"image_path": "assets/player/player1.png", "position": [735, 425], "image_size": [150, 150], "current_map": "lobby", "money": 6450, "max_blood": 260, "blood": 260, "exp": 0}, {"image_path": "assets/player/player2.png", "position": [775, 425], "image_size": [150, 150], "current_map": "lobby", "money": 50, "max_blood": 100, "blood": 100, "exp": 0}]

@@ -11,9 +11,10 @@ class Player:
         self.current_map = "lobby"
         self.blocked_areas = {
             "lobby": [
-                pygame.Rect(0, 0, 775, 250),
-                pygame.Rect(116, 325, 36, 5),
-                pygame.Rect(217, 286, 144, 1),                
+                pygame.Rect(0, 0, 775, 270), #wall
+                pygame.Rect(230, 286, 144, 20), #chair           
+                pygame.Rect(680, 325, 90, 55), #leave table                
+                pygame.Rect(70, 315, 110, 55), #vending machine         
                 ],
             "game_map": [
                 pygame.Rect(250,172,80,100),
@@ -28,12 +29,13 @@ class Player:
         }
         if self.current_map == "lobby":
             self.trigger_areas = [
-                {"rect": pygame.Rect(98, 405, 97, 50), "message": "Do you want to buy something?", "pos": (20, 150), "target": "shop"},
-                {"rect": pygame.Rect(497, 320, 123, 20), "message": "Play the game NOW!", "pos": (440, 40), "target": "game_map"},
-                {"rect": pygame.Rect(700, 500, 80, 50), "message": "Exit Game?", "pos": (600, 100), "target": "exit"}
+                {"rect": pygame.Rect(60, 405, 110, 50), "message": "Do you want to buy something?", "pos": (20, 150), "target": "shop"},
+                {"rect": pygame.Rect(490, 315, 150, 50), "message": "Play the game NOW!", "pos": (440, 40), "target": "game_map"},
+                {"rect": pygame.Rect(715, 425, 80, 50), "message": "Exit Game?", "pos": (635, 320), "target": "exit"}
             ]
         self.current_trigger_info = None
         self.money = 500 # 初始金額
+        
         self.max_blood = 100
         self.blood = 100 #初始血量
         self.exp = 0 #初始經驗值
@@ -43,15 +45,23 @@ class Player:
         }
 
 
+    def get_collision_rect(self):
+        shrink_ratio = 0.6 #比例
+        new_width = int(self.rect.width * shrink_ratio)
+        new_height = int(self.rect.height * shrink_ratio)
+        new_rect = pygame.Rect(0, 0, new_width, new_height)
+        new_rect.center = self.rect.center
+        return new_rect
+
     def can_move_to_dx(self, dx):
-        future_rect = self.rect.move(dx, 0)
+        future_rect = self.get_collision_rect().move(dx, 0)
         for block in self.blocked_areas.get(self.current_map, []):
             if future_rect.colliderect(block):
                 return False
         return True
 
     def can_move_to_dy(self, dy):
-        future_rect = self.rect.move(0, dy)
+        future_rect = self.get_collision_rect().move(0, dy)
         for block in self.blocked_areas.get(self.current_map, []):
             if future_rect.colliderect(block):
                 return False

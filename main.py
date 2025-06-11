@@ -24,7 +24,7 @@ screen = pygame.display.set_mode((800, 600))
 pygame.display.set_caption("Game Lobby")
 
 # 載入背景圖
-bg_path = os.path.join("assets", "background", "lobby.png")
+bg_path = os.path.join("assets", "background", "lobby2.png")
 background = pygame.image.load(bg_path)
 background = pygame.transform.scale(background, (800, 600))
 
