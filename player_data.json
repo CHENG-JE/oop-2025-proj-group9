@@ -1,0 +1,1 @@
+[{"image_path": "assets/player/player1.png", "position": [735, 455], "image_size": [150, 150], "current_map": "lobby", "money": 7500, "max_blood": 400, "blood": 400, "exp": 660}, {"image_path": "assets/player/player2.png", "position": [740, 435], "image_size": [150, 150], "current_map": "lobby", "money": 5000, "max_blood": 100, "blood": 100, "exp": 0}]

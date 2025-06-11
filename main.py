@@ -5,6 +5,18 @@ from lobby.log_in import show_login_screen
 import lobby.shop as shop
 import lobby.game_map as game_map
 import level2.level2_game as level2_game
+import json
+
+def save_player_data_list(players, filename="player_data.json"):
+    with open(filename, "w") as f:
+        json.dump([p.to_dict() for p in players], f)
+
+def load_player_data(filename="player_data.json"):
+    if not os.path.exists(filename):
+        return []
+    with open(filename, "r") as f:
+        data = json.load(f)
+    return [Player.from_dict(d) for d in data]
 
 # 初始化
 pygame.init()
@@ -21,10 +33,10 @@ bg_rect = background.get_rect()
 bg_rect.topleft = (0, 0)  # 設定左上角在 (0, 0)
 
 
-# 玩家列表與初始選定角色
-current_player = show_login_screen()
+players = load_player_data()
+current_player = show_login_screen(players)
 current_player.rect.center = (400, 500)
-current_player.current_map = "lobby"  # ← 加在這
+current_player.current_map = "lobby"
 
 running = True
 clock = pygame.time.Clock()
@@ -37,13 +49,28 @@ while running:
             shop.handle_events(event, current_player)
         elif current_player.current_map in ("lobby", "game_map"):
             target_map = current_player.check_portal_trigger(event)
-            if target_map:
+            if target_map == "exit":
+                # 更新 players 列表中對應 current_player 的狀態
+                for i, p in enumerate(players):
+                    if p.original_image_path == current_player.original_image_path:
+                        players[i] = current_player
+                        break
+                else:
+                    players.append(current_player)
+                save_player_data_list(players)
+                running = False
+            elif target_map:
                 current_player.current_map = target_map
 
     # 持續檢測鍵盤按鍵狀態（非 event-based）
-    if current_player.current_map in ("lobby", "game_map"):
+    if current_player.current_map in ("lobby", "game_map", "shop"):
         keys = pygame.key.get_pressed()
         current_player.handle_input(keys)
+
+        # 在 shop 中按 ESC 回到 lobby
+        if current_player.current_map == "shop":
+            if keys[pygame.K_ESCAPE]:
+                current_player.current_map = "lobby"
 
     if current_player.current_map == "shop":
         shop.render(screen, current_player)
