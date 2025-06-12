@@ -14,11 +14,11 @@ INVINCIBLE_DURATION = 120
 
 # --- 基於物理計算得出的新常數 ---
 # 為了達到 0.5 秒跳躍時間和 200 像素跳躍高度，我們需要：
-# 重力加速度 a ≈ 6400 pixels/sec²
+# 重力加速度 a ≈ 6400 pixels/gsec²
 # 初始跳躍速度 v₀ ≈ -1600 pixels/sec
 # 換算成 60 FPS 遊戲迴圈中的值：
-GRAVITY = 1.8  # (6400 / 60 / 60)
-JUMP_SPEED = -27 # (-1600 / 60)
+GRAVITY = 2.2  # (6400 / 60 / 60)
+JUMP_SPEED = -33.3 # (-1600 / 60)
 
 # --- 新增的環境常數 ---
 GROUND_Y = 500  # 地平線的Y座標
@@ -51,7 +51,7 @@ class Enemy(pygame.sprite.Sprite):
     def __init__(self, x, y):
         super().__init__()
         self.image = pygame.image.load("assets/enemy/monster.png")
-        self.image = pygame.transform.scale(self.image, (150, 150))
+        self.image = pygame.transform.scale(self.image, (200, 200))
         self.rect = self.image.get_rect()
         self.rect.midbottom = (x, y) # 使用 midbottom 精確定位
         self.health = 100
