@@ -32,7 +32,7 @@ class Arrow(pygame.sprite.Sprite):
         # 載入圖片
         self.image = pygame.image.load("assets/weapon/arrow.png").convert_alpha()
         # 調整圖片大小
-        self.image = pygame.transform.scale(self.image, (40, 10))
+        self.image = pygame.transform.scale(self.image, (40, 100))
         
         self.direction = direction
         self.speed = speed
