@@ -45,6 +45,13 @@ class Player:
             "game_map": False
         }
 
+        # === 為 Level 3 新增的屬性 ===
+        self.vy = 0  # 垂直速度
+        self.on_ground = False  # 是否在地面上
+        self.facing_right = True  # 面朝方向，True為右
+        self.attack_cooldown = 0  # 攻擊冷卻計時器
+        self.invincible_timer = 0 # 無敵計時器
+
 
     def get_collision_rect(self):
         shrink_ratio = 0.6 #比例
@@ -69,6 +76,8 @@ class Player:
         return True
 
     def handle_input(self, keys):
+        # 這個 handle_input 主要用於 lobby 和 level2 的俯視角移動
+        # level3 的平台跳躍移動邏輯在 level3_game.py 中處理
         print("KEYDOWN:", (self.rect.centerx, self.rect.centery))  # 檢測座標用
         if self.current_map == "lobby":
             speed = 5
@@ -136,9 +145,14 @@ class Player:
         center = self.rect.center
         self.rect = self.image.get_rect()
         self.rect.center = center
+        
     def update(self):
-    # 預留未來動畫或狀態更新用，目前不做任何事
-        pass
+    # 更新所有計時器
+        if self.attack_cooldown > 0:
+            self.attack_cooldown -= 1
+        if self.invincible_timer > 0:
+            self.invincible_timer -= 1
+
     def to_dict(self):
         return {
             "image_path": self.original_image_path,
