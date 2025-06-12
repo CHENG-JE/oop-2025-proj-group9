@@ -5,6 +5,7 @@ from lobby.log_in import show_login_screen
 import lobby.shop as shop
 import lobby.game_map as game_map
 import level2.level2_game as level2_game
+import level3.level3_game as level3_game
 import json
 
 def save_player_data_list(players, filename="player_data.json"):
@@ -42,6 +43,9 @@ running = True
 clock = pygame.time.Clock()
 # 主迴圈
 while running:
+    # ### DEBUG ### 在每一幀開始時印出當前地圖狀態
+    print(f"--- FRAME START --- Map: {current_player.current_map}, Player at: {current_player.rect.center}")
+
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
@@ -50,86 +54,68 @@ while running:
         elif current_player.current_map in ("lobby", "game_map"):
             target_map = current_player.check_portal_trigger(event)
             if target_map == "exit":
-                # 更新 players 列表中對應 current_player 的狀態
-                for i, p in enumerate(players):
-                    if p.original_image_path == current_player.original_image_path:
-                        players[i] = current_player
-                        break
-                else:
-                    players.append(current_player)
-                save_player_data_list(players)
+                # ... 省略 ...
                 running = False
             elif target_map:
                 current_player.current_map = target_map
-
-    # 持續檢測鍵盤按鍵狀態（非 event-based）
-    if current_player.current_map in ("lobby", "game_map", "shop"):
-        keys = pygame.key.get_pressed()
+    
+    keys = pygame.key.get_pressed()
+    
+    # 根據當前地圖更新遊戲狀態
+    if current_player.current_map == "lobby":
+        screen.blit(background, (0, 0))
         current_player.handle_input(keys)
+        current_player.draw(screen)
 
-        # 在 shop 中按 ESC 回到 lobby
-        if current_player.current_map == "shop":
-            if keys[pygame.K_ESCAPE]:
-                current_player.current_map = "lobby"
-
-    if current_player.current_map == "shop":
+    elif current_player.current_map == "shop":
+        # ... 省略 ...
         shop.render(screen, current_player)
+
     elif current_player.current_map == "game_map":
         game_map.render(screen, current_player)
+        current_player.handle_input(keys)
 
-        # 進入level1
-        zone_rect = pygame.Rect(105, 430, 120, 100)  # 將高度由 0 改為 100
-        if zone_rect.collidepoint(current_player.rect.center):
-            font = pygame.font.SysFont(None, 36)
-            text = font.render("Press Enter to start the game", True, (255, 255, 255))
-            # 將提示顯示邏輯放在地圖繪製之後
-            screen.blit(text, (300, 550))
+        level1_zone = pygame.Rect(50, 475, 150, 40)
+        level2_zone = pygame.Rect(400, 90, 100, 90)
+        level3_zone = pygame.Rect(610, 80, 100, 50)
 
-            keys = pygame.key.get_pressed()
+        font = pygame.font.SysFont(None, 36)
+        prompt_text = font.render("Press Enter to start the game", True, (255, 255, 255))
+
+        if level1_zone.collidepoint(current_player.rect.center):
+            screen.blit(prompt_text, (300, 550))
             if keys[pygame.K_RETURN]:
-                # 更換玩家圖片與切換關卡
+                print("### DEBUG ### 'Level 1' 區域觸發 (載入 Level 2)")
                 current_player.image = pygame.image.load("assets/player/fighter.png")
-                current_player.image = pygame.transform.scale(current_player.image, current_player.image_size)
+                current_player.resize_image(current_player.image_size)
                 level2_game.init_level2(current_player)
-                current_player.current_map = "level1"
-
-        # level2
-        zone_rect = pygame.Rect(600, 200, 120, 100)  # 將高度由 0 改為 100
-        if zone_rect.collidepoint(current_player.rect.center):
-            font = pygame.font.SysFont(None, 36)
-            text = font.render("Press Enter to start the game", True, (255, 255, 255))
-            # 將提示顯示邏輯放在地圖繪製之後
-            screen.blit(text, (300, 550))
-
-            keys = pygame.key.get_pressed()
+                print(f"### DEBUG ### 地圖狀態被 init_level2 設定為: {current_player.current_map}")
+                
+        elif level2_zone.collidepoint(current_player.rect.center):
+            screen.blit(prompt_text, (300, 550))
             if keys[pygame.K_RETURN]:
-                # 更換玩家圖片與切換關卡
+                print("### DEBUG ### 'Level 2' 區域觸發")
                 current_player.image = pygame.image.load("assets/player/fighter.png")
-                current_player.image = pygame.transform.scale(current_player.image, current_player.image_size)
+                current_player.resize_image(current_player.image_size)
                 level2_game.init_level2(current_player)
-                current_player.current_map = "level2"
-        
-        # level3
-        zone_rect = pygame.Rect(384, 150, 120, 100)  # 將高度由 0 改為 100
-        if zone_rect.collidepoint(current_player.rect.center):
-            font = pygame.font.SysFont(None, 36)
-            text = font.render("Press Enter to start the game", True, (255, 255, 255))
-            # 將提示顯示邏輯放在地圖繪製之後
-            screen.blit(text, (300, 550))
-
-            keys = pygame.key.get_pressed()
+                print(f"### DEBUG ### 地圖狀態被 init_level2 設定為: {current_player.current_map}")
+                
+        elif level3_zone.collidepoint(current_player.rect.center):
+            screen.blit(prompt_text, (300, 550))
             if keys[pygame.K_RETURN]:
-                # 更換玩家圖片與切換關卡
-                current_player.image = pygame.image.load("assets/player/fighter.png")
-                current_player.image = pygame.transform.scale(current_player.image, current_player.image_size)
-                level2_game.init_level2(current_player)
-                current_player.current_map = "level2"
-
+                print("### DEBUG ### 'Level 3' 區域觸發")
+                current_player.image = pygame.image.load("assets/player/archer.png")
+                current_player.resize_image(current_player.image_size)
+                level3_game.init_level3(current_player)
+                print(f"### DEBUG ### 地圖狀態被 init_level3 設定為: {current_player.current_map}")
+                
     elif current_player.current_map == "level2":
         level2_game.update_level2(current_player, screen)
+    elif current_player.current_map == "level3":
+        level3_game.update_level3(current_player, screen)
     else:
         screen.blit(background, (0, 0))
         current_player.draw(screen)
 
     pygame.display.flip()
-    clock.tick(120)  # 加這一行來限制 FPS
+    clock.tick(60) # 建議用 60 幀比較穩定
