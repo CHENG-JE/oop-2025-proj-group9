@@ -188,9 +188,9 @@ def update_level3(player, screen):
     
     if keys[pygame.K_j] and player.attack_cooldown == 0:
         direction = "right" if player.facing_right else "left"
-        arrow = Arrow(player.rect.centerx, player.rect.centery, direction, speed=15, color=(255, 223, 0), width=30, height=5, damage=40)
+        arrow = Arrow(player.rect.centerx, player.rect.centery, direction, speed=15, damage=40)
         projectile_group.add(arrow)
-        player.attack_cooldown = ATTACK_COOLDOWN
+        player.attack_cooldown = ATTACK_COOLDOWN # ATTACK_COOLDOWN 的值是 30
 
     hits = pygame.sprite.groupcollide(projectile_group, enemy_group, True, False)
     for projectile, hit_enemies in hits.items():
