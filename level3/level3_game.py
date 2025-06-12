@@ -3,7 +3,7 @@ import sys, os
 import random
 # 確保可以從父目錄導入模組
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
-from weapon import Laser
+from weapon import Arrow
 
 # === 常數區 ===
 SCREEN_WIDTH = 800
@@ -188,7 +188,7 @@ def update_level3(player, screen):
     
     if keys[pygame.K_j] and player.attack_cooldown == 0:
         direction = "right" if player.facing_right else "left"
-        arrow = Laser(player.rect.centerx, player.rect.centery, direction, speed=15, color=(255, 223, 0), width=30, height=5, damage=40)
+        arrow = Arrow(player.rect.centerx, player.rect.centery, direction, speed=15, color=(255, 223, 0), width=30, height=5, damage=40)
         projectile_group.add(arrow)
         player.attack_cooldown = ATTACK_COOLDOWN
 
