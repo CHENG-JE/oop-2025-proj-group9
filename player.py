@@ -17,10 +17,9 @@ class Player:
                 pygame.Rect(70, 315, 110, 55), #vending machine         
                 ],
             "game_map": [
-                pygame.Rect(250,172,80,100),
-                pygame.Rect(270,390,60,100),
-                pygame.Rect(380,500,500,100),
-                pygame.Rect(270,500,500,100)
+                pygame.Rect(280,485,600,200), #下方河流
+                pygame.Rect(280,375,70,200) #下方河流s
+
             ],
             "level2":[
 
