@@ -27,7 +27,7 @@ class Laser(pygame.sprite.Sprite):
 
 
 class Arrow(pygame.sprite.Sprite):
-    def __init__(self, x, y, direction, speed=15, damage=40):
+    def __init__(self, x, y, direction, speed=15, damage=20):
         super().__init__()
         # 載入圖片
         self.image = pygame.image.load("assets/weapon/arrow.png").convert_alpha()
