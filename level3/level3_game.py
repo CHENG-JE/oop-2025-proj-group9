@@ -61,13 +61,12 @@ def handle_game_over(screen, main_player, win):
     font = pygame.font.SysFont(None, 60)
     if win:
         text1 = font.render("You Win!", True, (0, 255, 0))
-        text2_str = "You got $300 & 50 EXP"
+        text2_str = "You got $500"
         main_player.money += 300
-        main_player.exp = min(main_player.exp + 50, 1000)
     else:
-        text1 = font.render("You Lose!", True, (255, 0, 0))
-        text2_str = "You lose $50"
-        main_player.money = max(0, main_player.money - 50)
+        text1 = font.render("You were defeated!", True, (255, 0, 0))
+        text2_str = "You lose $300"
+        main_player.money = max(0, main_player.money - 100)
 
     # ... (後續等待畫面邏輯不變)
     text2 = pygame.font.SysFont(None, 40).render(text2_str, True, (255, 255, 255))
@@ -89,7 +88,10 @@ def handle_game_over(screen, main_player, win):
     main_player.current_map = "game_map"
     main_player.rect.center = (420, 180)
     main_player.resize_image((100, 100))
-    main_player.blood = archer.blood # 返回時繼承血量
+    if win:
+        main_player.blood = archer.blood # 返回時繼承血量
+    else:
+        main_player.blood = 100
 
 def update_level3(screen, main_player):
     # 遊戲結束判斷
@@ -110,7 +112,7 @@ def update_level3(screen, main_player):
     monster_effect_group.update()
 
     # 碰撞檢測
-    # 1. 玩家箭矢 vs 敵人
+    # 1. 玩家箭矢 vs 敵人 (不變)
     hits = pygame.sprite.groupcollide(player_projectile_group, enemy_group, True, False)
     for projectile, hit_enemies in hits.items():
         for enemy in hit_enemies:
@@ -122,17 +124,14 @@ def update_level3(screen, main_player):
         # 2a. vs 光波
         beam_hits = pygame.sprite.spritecollide(archer, monster_projectile_group, True)
         if beam_hits:
-            archer.blood -= 50; archer.invincible_timer = INVINCIBLE_DURATION
+            archer.blood -= 50
+            archer.invincible_timer = INVINCIBLE_DURATION
         
-        # 2b. vs 震盪波
-        wave_hits = pygame.sprite.spritecollide(archer, monster_effect_group, True) # 碰到後消失
+        # 2b. vs 震盪波 (現在只負責扣血)
+        wave_hits = pygame.sprite.spritecollide(archer, monster_effect_group, True)
         if wave_hits:
-            for wave in wave_hits:
-                archer.blood -= wave.damage
-                # 如果是第一階段的震波，觸發怪物移動
-                if wave.stage == 1 and monster:
-                    monster.state = 'moving_to_target'
-                    monster.target_pos = (archer.rect.centerx, monster.rect.midbottom[1])
+            # 只需從震盪波物件本身獲取傷害值並扣血即可
+            archer.blood -= wave_hits[0].damage
             archer.invincible_timer = INVINCIBLE_DURATION
 
     # --- 繪製所有內容 ---
