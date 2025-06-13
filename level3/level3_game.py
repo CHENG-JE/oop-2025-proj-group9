@@ -103,51 +103,45 @@ def update_level3(screen, main_player):
     # 更新物件
     keys = pygame.key.get_pressed()
     archer.update(keys, platform_group, player_projectile_group)
-    monster.update(platform_group, archer, monster_projectile_group, monster_effect_group)
+    if monster: # 確保 monster 存在才更新
+        monster.update(platform_group, archer, monster_projectile_group, monster_effect_group)
+    player_projectile_group.update()
     monster_projectile_group.update()
     monster_effect_group.update()
 
     # 碰撞檢測
-    # 1. 玩家的箭矢 vs 敵人
+    # 1. 玩家箭矢 vs 敵人
     hits = pygame.sprite.groupcollide(player_projectile_group, enemy_group, True, False)
     for projectile, hit_enemies in hits.items():
         for enemy in hit_enemies:
             enemy.health -= projectile.damage
-            if enemy.health <= 0:
-                enemy.kill()
-                archer.exp += 25
+            if enemy.health <= 0: enemy.kill(); archer.exp += 25
 
     # 2. 玩家 vs 怪物攻擊 (無敵幀判斷)
     if archer.invincible_timer == 0:
-        # 2a. 玩家 vs 光波
+        # 2a. vs 光波
         beam_hits = pygame.sprite.spritecollide(archer, monster_projectile_group, True)
         if beam_hits:
-            archer.blood -= 50
-            archer.invincible_timer = INVINCIBLE_DURATION
+            archer.blood -= 50; archer.invincible_timer = INVINCIBLE_DURATION
         
-        # 2b. 玩家 vs 震盪波
-        wave_hits = pygame.sprite.spritecollide(archer, monster_effect_group, False)
+        # 2b. vs 震盪波
+        wave_hits = pygame.sprite.spritecollide(archer, monster_effect_group, True) # 碰到後消失
         if wave_hits:
-            wave = wave_hits[0]
-            if hasattr(wave, 'damage') and wave.damage == 80:
-                archer.blood -= 80
-            else:
-                archer.blood -= 50
-                if monster:
-                    monster.target_pos = archer.rect.center
+            for wave in wave_hits:
+                archer.blood -= wave.damage
+                # 如果是第一階段的震波，觸發怪物移動
+                if wave.stage == 1 and monster:
                     monster.state = 'moving_to_target'
+                    monster.target_pos = (archer.rect.centerx, monster.rect.midbottom[1])
             archer.invincible_timer = INVINCIBLE_DURATION
-            wave.kill()
 
-    # 繪製所有內容
+    # --- 繪製所有內容 ---
     screen.blit(lev3_bg, (0, 0))
-    player_group.draw(screen)
+    # 正確的繪圖方式
+    for p in player_group: p.draw(screen) # 呼叫自訂的 draw 方法
     enemy_group.draw(screen)
-    player_projectile_group.draw(screen)
+    player_projectile_group.draw(screen) # 現在箭矢會被畫出來
     monster_projectile_group.draw(screen)
     monster_effect_group.draw(screen)
     
-    # 繪製UI
-    if monster:
-        monster.draw_health_bar(screen)
-    # (可以再增加繪製玩家血條的UI)
+    if monster: monster.draw_health_bar(screen)
