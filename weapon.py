@@ -25,7 +25,7 @@ class Arrow(pygame.sprite.Sprite):
     def __init__(self, x, y, direction, speed=15, damage=20):
         super().__init__()
         self.image = pygame.image.load("assets/weapon/arrow.png").convert_alpha()
-        self.image = pygame.transform.scale(self.image, (160, 40))
+        self.image = pygame.transform.scale(self.image, (100, 100))
         self.direction = direction
         self.speed = speed
         self.damage = damage
