@@ -4,6 +4,7 @@ from player import Player
 from lobby.log_in import show_login_screen
 import lobby.shop as shop
 import lobby.game_map as game_map
+import level1.level1_game as level1_game
 import level2.level2_game as level2_game
 import level3.level3_game as level3_game
 import json
@@ -41,11 +42,9 @@ current_player.current_map = "lobby"
 
 running = True
 clock = pygame.time.Clock()
+
 # 主迴圈
 while running:
-    # ### DEBUG ### 在每一幀開始時印出當前地圖狀態
-    print(f"--- FRAME START --- Map: {current_player.current_map}, Player at: {current_player.rect.center}")
-
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
@@ -54,7 +53,10 @@ while running:
         elif current_player.current_map in ("lobby", "game_map"):
             target_map = current_player.check_portal_trigger(event)
             if target_map == "exit":
-                # ... 省略 ...
+                print("### DEBUG ### 退出遊戲")
+                save_player_data_list(players)
+                pygame.quit()
+                exit()
                 running = False
             elif target_map:
                 current_player.current_map = target_map
@@ -68,7 +70,9 @@ while running:
         current_player.draw(screen)
 
     elif current_player.current_map == "shop":
-        # ... 省略 ...
+        screen.blit(background, (0, 0))
+        current_player.handle_input(keys)
+        current_player.draw(screen)
         shop.render(screen, current_player)
 
     elif current_player.current_map == "game_map":
@@ -85,11 +89,9 @@ while running:
         if level1_zone.collidepoint(current_player.rect.center):
             screen.blit(prompt_text, (300, 550))
             if keys[pygame.K_RETURN]:
-                print("### DEBUG ### 'Level 1' 區域觸發 (載入 Level 2)")
-                current_player.image = pygame.image.load("assets/player/fighter.png")
-                current_player.resize_image(current_player.image_size)
-                level2_game.init_level2(current_player)
-                print(f"### DEBUG ### 地圖狀態被 init_level2 設定為: {current_player.current_map}")
+                print("### DEBUG ### 'Level 1' 區域觸發")
+                level1_game.init_level1(current_player)
+                current_player.current_map = "level1"
                 
         elif level2_zone.collidepoint(current_player.rect.center):
             screen.blit(prompt_text, (300, 550))
@@ -108,8 +110,10 @@ while running:
                 current_player.resize_image(current_player.image_size)
                 level3_game.init_level3(current_player)
                 print(f"### DEBUG ### 地圖狀態被 init_level3 設定為: {current_player.current_map}")
-                current_player.current_map = "level3" 
-
+                current_player.current_map = "level3"
+    
+    elif current_player.current_map == "level1":
+        level1_game.update_level1(screen, current_player)
     elif current_player.current_map == "level2":
         level2_game.update_level2(current_player, screen)
     elif current_player.current_map == "level3":
