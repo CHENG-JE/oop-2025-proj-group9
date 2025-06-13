@@ -26,8 +26,8 @@ class Archer(pygame.sprite.Sprite):
         self.attack_cooldown = 0
         
         # 常數
-        self.gravity = 2.2
-        self.jump_speed = -33.3
+        self.gravity = 0.87
+        self.jump_speed = -20.8
         self.move_speed = 7
         self.left_boundary, self.right_boundary = boundaries
 
