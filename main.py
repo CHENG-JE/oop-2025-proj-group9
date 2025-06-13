@@ -108,8 +108,8 @@ while running:
                 current_player.resize_image(current_player.image_size)
                 level3_game.init_level3(current_player)
                 print(f"### DEBUG ### 地圖狀態被 init_level3 設定為: {current_player.current_map}")
-                current_player.current_map = "level3"
-                
+                current_player.current_map = "level3" 
+
     elif current_player.current_map == "level2":
         level2_game.update_level2(current_player, screen)
     elif current_player.current_map == "level3":
