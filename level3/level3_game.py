@@ -51,7 +51,7 @@ class Enemy(pygame.sprite.Sprite):
         self.rect.midbottom = (x, y)
         
         # === 改正 1：新增 max_health 屬性 ===
-        self.max_health = 100
+        self.max_health = 1000
         self.health = self.max_health
         
         self.direction = 1
