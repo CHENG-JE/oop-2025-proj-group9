@@ -112,7 +112,7 @@ while running:
     elif current_player.current_map == "level2":
         level2_game.update_level2(current_player, screen)
     elif current_player.current_map == "level3":
-        level3_game.update_level3(current_player, screen)
+        level3_game.update_level3(screen, current_player)
     else:
         screen.blit(background, (0, 0))
         current_player.draw(screen)
