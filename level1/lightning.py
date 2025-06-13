@@ -1,11 +1,11 @@
-# level1/lighting.py
+# level1/lightning.py
 import pygame
 
-class Lighting(pygame.sprite.Sprite):
+class Lightning(pygame.sprite.Sprite):
     def __init__(self, center_pos):
         super().__init__()
         try:
-            self.image = pygame.image.load("assets/items/lighting.png").convert_alpha()
+            self.image = pygame.image.load("assets/items/lightning.png").convert_alpha()
         except pygame.error:
             self.image = pygame.Surface((60, 60), pygame.SRCALPHA)
             pygame.draw.circle(self.image, (255, 255, 0, 180), (30, 30), 30)
