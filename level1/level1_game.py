@@ -14,7 +14,7 @@ from level1.droplet import Droplet
 
 # === 常數區 ===
 SCREEN_WIDTH, SCREEN_HEIGHT = 800, 600
-GRID_WIDTH, GRID_HEIGHT = 40, 30
+GRID_WIDTH, GRID_HEIGHT = 20, 15
 CELL_SIZE = SCREEN_WIDTH // GRID_WIDTH
 
 # === 全域物件 (Sprite Groups) ===
@@ -175,4 +175,4 @@ def handle_game_over(screen, main_player, win):
     
     main_player.reset_image()
     main_player.current_map = "game_map"
-    main_player.rect.center = (420, 180)
+    main_player.rect.center = (120, 490)
