@@ -13,7 +13,7 @@ class Archer(pygame.sprite.Sprite):
 
         # 角色外觀與位置
         self.image = pygame.image.load("assets/player/archer.png").convert_alpha()
-        self.image = pygame.transform.scale(self.image, (100, 100))
+        self.image = pygame.transform.scale(self.image, (200, 200))
         self.original_image_right = self.image
         self.original_image_left = pygame.transform.flip(self.image, True, False)
         self.rect = self.image.get_rect(midbottom=pos)
