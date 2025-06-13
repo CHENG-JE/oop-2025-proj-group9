@@ -81,5 +81,18 @@ class Archer(pygame.sprite.Sprite):
             self.attack_cooldown = 30
             
     def draw(self, screen):
-        # 如果需要畫血條等可以在此處添加
-        screen.blit(self.image, self.rect)
+        # 如果處於無敵狀態，加上半透明效果
+        if self.invincible_timer > 0 and self.invincible_timer % 10 < 5: # 閃爍效果
+            pass # 不繪製，造成閃爍
+        else:
+            screen.blit(self.image, self.rect)
+
+        # 繪製左上角的玩家狀態列
+        font = pygame.font.SysFont(None, 28)
+        money_text = font.render(f"Money: ${self.money}", True, (255, 255, 0))
+        hp_text = font.render(f"HP: {int(self.blood)}/{self.max_blood}", True, (0, 255, 0))
+        exp_text = font.render(f"EXP: {self.exp}", True, (0, 255, 255))
+        
+        screen.blit(money_text, (20, 20))
+        screen.blit(hp_text, (20, 45))
+        screen.blit(exp_text, (20, 70))
