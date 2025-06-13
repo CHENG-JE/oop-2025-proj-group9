@@ -6,41 +6,36 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 from weapon import Arrow
 
 # === 常數區 ===
+# ... (常數區不變，省略)
 SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 600
 MOVE_SPEED = 7
 ATTACK_COOLDOWN = 30
 INVINCIBLE_DURATION = 120
-
-# --- 基於物理計算得出的新常數 ---
-# 為了達到 0.5 秒跳躍時間和 200 像素跳躍高度，我們需要：
-# 重力加速度 a ≈ 6400 pixels/gsec²
-# 初始跳躍速度 v₀ ≈ -1600 pixels/sec
-# 換算成 60 FPS 遊戲迴圈中的值：
-GRAVITY = 2.2  # (6400 / 60 / 60)
-JUMP_SPEED = -33.3 # (-1600 / 60)
-
-# --- 新增的環境常數 ---
-GROUND_Y = 500  # 地平線的Y座標
-LEFT_BOUNDARY = 50   # 左邊界
-RIGHT_BOUNDARY = 750 # 右邊界
+GRAVITY = 2.2
+JUMP_SPEED = -33.3
+GROUND_Y = 500
+LEFT_BOUNDARY = 50
+RIGHT_BOUNDARY = 750
 
 
 # === 全域物件 ===
+# ... (不變，省略)
 platform_group = pygame.sprite.Group()
 enemy_group = pygame.sprite.Group()
 projectile_group = pygame.sprite.Group()
 effect_group = pygame.sprite.Group()
+
 
 # === 背景圖片 ===
 lev3_map = pygame.image.load("assets/background/level3.jpeg")
 lev3_bg = pygame.transform.scale(lev3_map, (SCREEN_WIDTH, SCREEN_HEIGHT))
 
 class Platform(pygame.sprite.Sprite):
+    # ... (Platform 類別不變，省略)
     def __init__(self, x, y, width, height):
         super().__init__()
         self.image = pygame.Surface([width, height])
-        # 讓平台隱形
         self.image.set_colorkey((0,0,0))
         self.image.fill((0,0,0))
         self.rect = self.image.get_rect()
@@ -51,15 +46,20 @@ class Enemy(pygame.sprite.Sprite):
     def __init__(self, x, y):
         super().__init__()
         self.image = pygame.image.load("assets/enemy/monster.png")
-        self.image = pygame.transform.scale(self.image, (200, 200))
+        self.image = pygame.transform.scale(self.image, (200, 200)) # 假設怪物大小為 200x200
         self.rect = self.image.get_rect()
-        self.rect.midbottom = (x, y) # 使用 midbottom 精確定位
-        self.health = 100
+        self.rect.midbottom = (x, y)
+        
+        # === 改正 1：新增 max_health 屬性 ===
+        self.max_health = 100
+        self.health = self.max_health
+        
         self.direction = 1
         self.speed = 2
         self.vy = 0
 
     def update(self, platforms):
+        # ... (update 方法不變，省略)
         self.vy += GRAVITY
         self.rect.y += self.vy
 
@@ -73,28 +73,25 @@ class Enemy(pygame.sprite.Sprite):
         
         if on_ground:
             self.rect.x += self.speed * self.direction
-            # === 改用新的邊界進行判斷 ===
             if self.rect.right > RIGHT_BOUNDARY or self.rect.left < LEFT_BOUNDARY:
                 self.direction *= -1
                 self.image = pygame.transform.flip(self.image, True, False)
 
 
 def init_level3(player):
+    # ... (init_level3 方法不變，省略)
     player.current_map = "level3"
     
-    # === 更改平台設定：只有一個地平線 ===
     platform_group.empty()
-    platform_group.add(Platform(0, GROUND_Y, SCREEN_WIDTH, 20)) # 在 y=500 建立一個寬屏平台
+    platform_group.add(Platform(0, GROUND_Y, SCREEN_WIDTH, 20))
 
-    # === 更改角色和敵人的初始位置 ===
-    player.rect.midbottom = (250, GROUND_Y) # 角色初始位置 (250, 500)
+    player.rect.midbottom = (250, GROUND_Y)
     
     enemy_group.empty()
     projectile_group.empty()
-    enemy = Enemy(550, GROUND_Y) # 怪物初始位置 (550, 500)
+    enemy = Enemy(550, GROUND_Y)
     enemy_group.add(enemy)
     
-    # 重置玩家狀態
     player.vy = 0
     player.on_ground = False
     player.facing_right = True
@@ -103,8 +100,7 @@ def init_level3(player):
 
 
 def handle_game_over(screen, player, win):
-    # (此函式內容不變，省略以節省篇幅)
-    # ...
+    # ... (handle_game_over 方法不變，省略)
     font = pygame.font.SysFont(None, 60)
     if win:
         text1 = font.render("You Win!", True, (0, 255, 0))
@@ -139,8 +135,9 @@ def handle_game_over(screen, player, win):
     player.resize_image((100, 100))
     player.blood = player.max_blood
 
+# === 改正 2：修改 update_level3 函式 ===
 def update_level3(player, screen):
-    # (此函式大部分內容不變，僅修改移動邊界，此處省略部分以節省篇幅)
+    # (前面邏輯不變，省略)
     # ...
     if player.blood <= 0:
         handle_game_over(screen, player, win=False)
@@ -172,7 +169,6 @@ def update_level3(player, screen):
     keys = pygame.key.get_pressed()
     original_facing = player.facing_right
 
-    # === 更改玩家的移動邊界 ===
     if keys[pygame.K_a] and player.rect.left > LEFT_BOUNDARY:
         player.rect.x -= MOVE_SPEED
         player.facing_right = False
@@ -188,9 +184,9 @@ def update_level3(player, screen):
     
     if keys[pygame.K_j] and player.attack_cooldown == 0:
         direction = "right" if player.facing_right else "left"
-        arrow = Arrow(player.rect.centerx, player.rect.centery, direction, speed=15, damage=40)
+        arrow = Arrow(player.rect.centerx, player.rect.centery, direction)
         projectile_group.add(arrow)
-        player.attack_cooldown = ATTACK_COOLDOWN # ATTACK_COOLDOWN 的值是 30
+        player.attack_cooldown = ATTACK_COOLDOWN
 
     hits = pygame.sprite.groupcollide(projectile_group, enemy_group, True, False)
     for projectile, hit_enemies in hits.items():
@@ -205,7 +201,8 @@ def update_level3(player, screen):
         if hits:
             player.blood -= 20
             player.invincible_timer = INVINCIBLE_DURATION
-
+    
+    # --- 繪圖區 ---
     platform_group.draw(screen)
     enemy_group.draw(screen)
     projectile_group.draw(screen)
@@ -214,3 +211,34 @@ def update_level3(player, screen):
     font = pygame.font.SysFont(None, 28)
     enemy_text = font.render(f"Enemies left: {len(enemy_group)}", True, (255, 255, 0))
     screen.blit(enemy_text, (SCREEN_WIDTH - 150, 20))
+
+    # --- 新增：繪製怪物血條 ---
+    # 只有在場上有怪物時才繪製血條
+    if enemy_group:
+        # 獲取唯一的怪物實例
+        monster = enemy_group.sprites()[0]
+        
+        # 血條位置和尺寸
+        bar_x = 250
+        bar_y = 80
+        bar_width = 450
+        bar_height = 20
+        
+        # 計算血量百分比和當前血條寬度
+        health_percent = monster.health / monster.max_health
+        current_bar_width = bar_width * health_percent
+        
+        # 繪製血條背景 (紅色)
+        pygame.draw.rect(screen, (255, 0, 0), (bar_x, bar_y, bar_width, bar_height))
+        # 繪製當前血量 (綠色)
+        pygame.draw.rect(screen, (0, 255, 0), (bar_x, bar_y, current_bar_width, bar_height))
+        
+        # --- 新增：繪製血條標題 ---
+        title_font = pygame.font.SysFont(None, 24)
+        title_text = "Primordial bathysmal vishap"
+        title_surface = title_font.render(title_text, True, (255, 255, 255))
+        
+        # 將標題放在血條正上方的中間位置
+        title_rect = title_surface.get_rect()
+        title_rect.midbottom = (bar_x + bar_width / 2, bar_y)
+        screen.blit(title_surface, title_rect)
