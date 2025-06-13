@@ -38,8 +38,6 @@ class Arrow(pygame.sprite.Sprite):
         if self.rect.right < 0 or self.rect.left > 800:
             self.kill()
 
-# === 從 level3_game.py 移動過來的類別 ===
-
 class MonsterBeam(pygame.sprite.Sprite):
     def __init__(self, start_pos, target_pos):
         super().__init__()
@@ -54,7 +52,7 @@ class MonsterBeam(pygame.sprite.Sprite):
         
         angle = math.atan2(target_pos[1] - start_pos[1], target_pos[0] - start_pos[0])
         arrow_speed = 15
-        self.speed = arrow_speed * 0.7
+        self.speed = arrow_speed * 0.5
         self.vx = math.cos(angle) * self.speed
         self.vy = math.sin(angle) * self.speed
 
