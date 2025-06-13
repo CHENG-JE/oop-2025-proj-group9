@@ -16,13 +16,10 @@ class Monster(pygame.sprite.Sprite):
         self.health = self.max_health
         self.vy = 0
 
-        # === 狀態機與計時器 ===
         self.state = 'idle'
-        self.attack_cooldown = 120 # 攻擊之間的冷卻
-        self.shockwave_lifetime = 60 # 震波在畫面上持續的時間 (1秒)
+        self.attack_cooldown = 120
         self.target_pos = None
 
-        # 常數
         self.gravity = 2.2
         self.move_speed = 10 
         self.left_boundary, self.right_boundary = boundaries
@@ -37,55 +34,49 @@ class Monster(pygame.sprite.Sprite):
                 self.vy = 0
                 break
         
-        # === 最終版 AI 狀態機 ===
+        # 狀態機 AI
         if self.state == 'idle':
             self.attack_cooldown -= 1
             if self.attack_cooldown <= 0:
-                # 決定攻擊模式
-                if random.random() < 0.8: # 80% 機率光波
-                    # --- 光波攻擊 ---
+                if random.random() < 0.8:
                     beam = MonsterBeam(self.rect.center, player.rect.center)
                     monster_projectile_group.add(beam)
-                    self.attack_cooldown = 42 # 攻擊後冷卻 0.7 秒
-                else: # 20% 機率震地
-                    # --- 震地攻擊 ---
+                    self.attack_cooldown = 42
+                else:
                     self.state = 'shockwave_stage1'
         
         elif self.state == 'shockwave_stage1':
-            # 階段一：在原地放出第一個震波
             wave = Shockwave(self.rect.midbottom, self.rect.width, damage=30, stage=1)
             monster_effect_group.add(wave)
-            
-            # 記錄下當前玩家的X座標，作為移動目標
             self.target_pos = (player.rect.centerx, self.rect.midbottom[1])
-            
-            # 立刻進入移動狀態
             self.state = 'moving_to_target'
 
         elif self.state == 'moving_to_target':
             if self.target_pos:
                 dx = self.target_pos[0] - self.rect.centerx
-                # 判斷是否已到達目的地
-                if abs(dx) < self.move_speed:
-                    self.rect.centerx = self.target_pos[0]
-                    self.state = 'shockwave_stage2' # 到達後進入最終階段
+                direction = 1 if dx > 0 else -1
+                
+                # === 新增：判斷是否已經撞牆而無法前進 ===
+                is_stuck_at_wall = (
+                    (self.rect.left <= self.left_boundary and direction == -1) or
+                    (self.rect.right >= self.right_boundary and direction == 1)
+                )
+
+                # 如果到達目標，或者已經被牆卡住，就進入下一階段
+                if abs(dx) < self.move_speed or is_stuck_at_wall:
+                    self.state = 'shockwave_stage2'
                 else:
-                    # 繼續朝目標移動
-                    direction = 1 if dx > 0 else -1
+                    # 繼續移動
                     self.rect.x += self.move_speed * direction
-                    # 確保不出邊界
+                    # 確保不出邊界 (這一步是備用，主要靠上面的 is_stuck_at_wall 判斷)
                     if self.rect.left < self.left_boundary: self.rect.left = self.left_boundary
                     if self.rect.right > self.right_boundary: self.rect.right = self.right_boundary
         
         elif self.state == 'shockwave_stage2':
-            # 階段三：在移動後的位置放出第二個震波
             wave = Shockwave(self.rect.midbottom, self.rect.width, damage=50, stage=2)
             monster_effect_group.add(wave)
-            
-            # 整套攻擊結束，返回閒置狀態並進入冷卻
             self.state = 'idle'
-            self.attack_cooldown = 180 # 震地攻擊的總冷卻時間為3秒
-
+            self.attack_cooldown = 180
             
     def draw_health_bar(self, screen):
         # (此函式不變)
