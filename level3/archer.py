@@ -12,7 +12,7 @@ class Archer(pygame.sprite.Sprite):
         self.money = 0 # 假設從0開始或從主玩家傳入
 
         # 角色外觀與位置
-        self.image = pygame.image.load("assets/player/archer.jpeg").convert_alpha()
+        self.image = pygame.image.load("assets/player/archer.png").convert_alpha()
         self.image = pygame.transform.scale(self.image, (100, 100))
         self.original_image_right = self.image
         self.original_image_left = pygame.transform.flip(self.image, True, False)
