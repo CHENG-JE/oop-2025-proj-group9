@@ -243,7 +243,7 @@ def update_level2(player, screen):
                 if event.type == pygame.KEYDOWN:
                     player.reset_image()
                     player.current_map = "game_map"
-                    player.rect.center = (460, 170)  # 設定指定位置
+                    player.rect.center = (445, 125)  # 設定指定位置
                     player.resize_image((100, 100))  # 根據需要重新縮放圖片
                     player.blood = player.blood
                     if player.exp <= 900:
