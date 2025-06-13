@@ -234,7 +234,15 @@ def update_level3(player, screen):
         pygame.draw.rect(screen, (0, 255, 0), (bar_x, bar_y, current_bar_width, bar_height))
         
         # --- 新增：繪製血條標題 ---
-        title_font = pygame.font.SysFont(None, 24)
+        try:
+            # 載入自訂字體檔案
+            font_path = "assets/fonts/Cinzel/static/Cinzel-Regular.ttf"
+            title_font = pygame.font.Font(font_path, 22) # 22 是字體大小，可以隨意調整
+        except FileNotFoundError:
+            # 如果找不到字體檔案，就使用系統預設字體，避免程式閃退
+            print(f"警告：找不到字體檔案 {font_path}，將使用預設字體。")
+            title_font = pygame.font.SysFont(None, 24)
+            
         title_text = "Primordial bathysmal vishap"
         title_surface = title_font.render(title_text, True, (255, 255, 255))
         
