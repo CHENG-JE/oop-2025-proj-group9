@@ -45,8 +45,8 @@ def init_level3(main_player):
     global archer
     archer = Archer(pos=(250, GROUND_Y), boundaries=BOUNDARIES)
     # 繼承主遊戲的狀態
-    archer.money = main_player.money
-    archer.exp = main_player.exp
+    archer.max_blood = main_player.max_blood
+    archer.blood = main_player.blood
     player_group.add(archer)
     all_sprites.add(archer)
     
