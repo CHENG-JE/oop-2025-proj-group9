@@ -7,9 +7,9 @@ import random
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 # 從新檔案中導入類別
-from level1.wall import Wall
+from level1.wall import HorizontalWall, VerticalWall
 from level1.portal import Portal
-from level1.lighting import Lighting
+from level1.lightning import Lightning
 from level1.droplet import Droplet
 
 # === 常數區 ===
@@ -21,7 +21,7 @@ CELL_SIZE = SCREEN_WIDTH // GRID_WIDTH
 wall_group = pygame.sprite.Group()
 portal_group = pygame.sprite.Group()
 player_group = pygame.sprite.Group()
-lighting_group = pygame.sprite.Group()
+lightning_group = pygame.sprite.Group()
 
 # === 場景物件 ===
 droplet = None
@@ -34,26 +34,48 @@ lev1_bg = pygame.transform.scale(pygame.image.load("assets/background/level1.jpe
 # === 函式區 ===
 def generate_maze():
     wall_group.empty()
-    grid_data = [[False for _ in range(GRID_WIDTH)] for _ in range(GRID_HEIGHT)]
-    
-    for y in range(GRID_HEIGHT):
-        for x in range(GRID_WIDTH):
-            is_border = (x == 0 or x == GRID_WIDTH - 1 or y == 0 or y == GRID_HEIGHT - 1)
-            if is_border or random.random() < 0.25: # 25% 的機率生成牆壁
-                grid_data[y][x] = True
-                wall_group.add(Wall(x * CELL_SIZE, y * CELL_SIZE, CELL_SIZE))
-    return grid_data
+    # 建立兩個網格，分別存儲水平和垂直的牆壁狀態
+    h_walls = [[False for _ in range(GRID_WIDTH)] for _ in range(GRID_HEIGHT + 1)]
+    v_walls = [[False for _ in range(GRID_WIDTH + 1)] for _ in range(GRID_HEIGHT)]
 
-def spawn_portal(grid_data):
-    portal_group.empty()
-    
-    # 找出所有在外兩圈，且不是牆壁的位置
-    valid_spawns = []
-    for y in range(GRID_HEIGHT):
+    for y in range(GRID_HEIGHT + 1):
         for x in range(GRID_WIDTH):
+            # 建立最外圈的水平牆壁
+            is_top_or_bottom_border = (y == 0 or y == GRID_HEIGHT)
+            if is_top_or_bottom_border or random.random() < 0.2:
+                h_walls[y][x] = True
+
+    for y in range(GRID_HEIGHT):
+        for x in range(GRID_WIDTH + 1):
+            # 建立最外圈的垂直牆壁
+            is_left_or_right_border = (x == 0 or x == GRID_WIDTH)
+            if is_left_or_right_border or random.random() < 0.2:
+                v_walls[y][x] = True
+                
+    return h_walls, v_walls
+
+def create_walls_from_grid(h_walls, v_walls):
+    wall_group.empty()
+    # 根據網格數據建立牆壁物件
+    for y in range(GRID_HEIGHT + 1):
+        for x in range(GRID_WIDTH):
+            if h_walls[y][x]:
+                wall_group.add(HorizontalWall(x * CELL_SIZE, y * CELL_SIZE, CELL_SIZE))
+    for y in range(GRID_HEIGHT):
+        for x in range(GRID_WIDTH + 1):
+            if v_walls[y][x]:
+                wall_group.add(VerticalWall(x * CELL_SIZE, y * CELL_SIZE, CELL_SIZE))
+
+def spawn_portal(h_walls, v_walls):
+    portal_group.empty()
+    valid_spawns = []
+    for y in range(1, GRID_HEIGHT - 1): # 確保不在最頂和最底
+        for x in range(1, GRID_WIDTH - 1): # 確保不在最左和最右
             is_in_outer_rings = (x in [1, 2, GRID_WIDTH - 2, GRID_WIDTH - 3] or 
                                  y in [1, 2, GRID_HEIGHT - 2, GRID_HEIGHT - 3])
-            if is_in_outer_rings and not grid_data[y][x]:
+            # 檢查該格子四周是否都沒有牆
+            is_open = not (h_walls[y][x] or h_walls[y+1][x] or v_walls[y][x] or v_walls[y][x+1])
+            if is_in_outer_rings and is_open:
                 valid_spawns.append((x, y))
     
     if valid_spawns:
@@ -63,77 +85,68 @@ def spawn_portal(grid_data):
         portal_group.add(portal)
 
 def init_level1(main_player):
-    global droplet, round_count, maze_timer, portal_timer
-    
-    # 清空所有群組
-    for group in [wall_group, portal_group, player_group, lighting_group]:
-        group.empty()
+    global droplet, round_count, maze_timer, portal_timer, grid_data
+    for group in [wall_group, portal_group, player_group, lightning_group]: group.empty()
         
-    # 初始化變數
-    round_count = 1
-    maze_timer = 4 * 60 # 4秒
-    portal_timer = 28 * 60 # 28秒
+    round_count = 1; maze_timer = 4 * 60; portal_timer = 28 * 60
 
-    # 建立迷宮和傳送門
-    grid = generate_maze()
-    spawn_portal(grid)
+    h_walls, v_walls = generate_maze()
+    
+    # 清空出生點區域的牆壁
+    start_grid_x = 380 // CELL_SIZE
+    start_grid_y = 280 // CELL_SIZE
+    for y in range(start_grid_y - 1, start_grid_y + 2):
+        for x in range(start_grid_x - 1, start_grid_x + 2):
+            if 0 <= y < GRID_HEIGHT and 0 <= x < GRID_WIDTH:
+                h_walls[y][x] = False
+                h_walls[y+1][x] = False
+                v_walls[y][x] = False
+                v_walls[y][x+1] = False
+    
+    create_walls_from_grid(h_walls, v_walls)
+    spawn_portal(h_walls, v_walls)
 
-    # 建立玩家
-    droplet = Droplet(start_pos=(CELL_SIZE * 1.5, CELL_SIZE * 1.5), cell_size=CELL_SIZE)
-    droplet.money = main_player.money
-    droplet.exp = main_player.exp
-    droplet.max_blood = main_player.max_blood
-    droplet.blood = main_player.blood
+    droplet = Droplet(start_pos=(380, 280), cell_size=CELL_SIZE)
+    droplet.money = main_player.money; droplet.exp = main_player.exp
+    droplet.max_blood = main_player.max_blood; droplet.blood = main_player.blood
     player_group.add(droplet)
 
 def update_level1(screen, main_player):
     global maze_timer, portal_timer, round_count
     
-    # 遊戲結束判斷
-    if not droplet or droplet.blood <= 0:
-        handle_game_over(screen, main_player, win=False)
-        return
-    if pygame.sprite.spritecollide(droplet, portal_group, False):
-        handle_game_over(screen, main_player, win=True)
-        return
+    if not droplet or droplet.blood <= 0: handle_game_over(screen, main_player, win=False); return
+    if pygame.sprite.spritecollide(droplet, portal_group, False): handle_game_over(screen, main_player, win=True); return
 
-    # --- 更新計時器 ---
     maze_timer -= 1
     if maze_timer <= 0:
         round_count += 1
-        grid = generate_maze()
-        spawn_portal(grid) # 迷宮重置時，傳送門也重置
+        h_walls, v_walls = generate_maze()
+        create_walls_from_grid(h_walls, v_walls)
+        spawn_portal(h_walls, v_walls)
         portal_timer = 28 * 60
         maze_timer = 4 * 60
-        # 產生閃電
-        lighting = Lighting(droplet.rect.center)
-        lighting_group.add(lighting)
+        lightning = Lightning(droplet.rect.center); lightning_group.add(lightning)
         droplet.take_damage(20)
 
     portal_timer -= 1
     if portal_timer <= 0:
-        # 重新生成傳送門需要 grid data，但我們沒有儲存
-        # 為了簡化，我們讓它和迷宮一起重置
+        # 由於 portal 生成依賴網格數據，我們讓它在迷宮重置時一起重置即可
         portal_timer = 28 * 60
         
-    # --- 更新物件 ---
     keys = pygame.key.get_pressed()
     player_group.update(keys, wall_group)
-    lighting_group.update()
+    lightning_group.update()
     
-    # --- 繪製所有內容 ---
     screen.blit(lev1_bg, (0, 0))
     wall_group.draw(screen)
     portal_group.draw(screen)
     player_group.draw(screen)
-    lighting_group.draw(screen)
+    lightning_group.draw(screen)
     
-    # UI
     droplet.draw_ui(screen)
     font = pygame.font.SysFont(None, 36)
     round_text = font.render(f"Round: {round_count}", True, (255, 255, 255))
     screen.blit(round_text, (SCREEN_WIDTH - round_text.get_width() - 20, 20))
-
 
 def handle_game_over(screen, main_player, win):
     # (此函式與 Level 3 基本相同)
