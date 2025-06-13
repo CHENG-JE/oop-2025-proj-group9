@@ -13,7 +13,7 @@ class Droplet(pygame.sprite.Sprite):
         
         # 圖像與旋轉
         self.original_image = pygame.image.load("assets/player/droplet.png").convert_alpha()
-        self.original_image = pygame.transform.scale(self.original_image, (cell_size, cell_size))
+        self.original_image = pygame.transform.scale(self.original_image, (34, 17))
         self.image = self.original_image
         
         # 位置與移動
