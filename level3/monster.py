@@ -80,6 +80,12 @@ class Monster(pygame.sprite.Sprite):
                 else:
                     direction = 1 if dx > 0 else -1
                     self.rect.x += self.move_speed * direction
+                    
+                    # === 新增：限制怪物移動不出邊界 ===
+                    if self.rect.left < self.left_boundary:
+                        self.rect.left = self.left_boundary
+                    if self.rect.right > self.right_boundary:
+                        self.rect.right = self.right_boundary
         
         elif self.state == 'shockwave_stomp':
             wave = Shockwave(self.rect.midbottom, self.rect.width)
