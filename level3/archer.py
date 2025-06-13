@@ -13,7 +13,7 @@ class Archer(pygame.sprite.Sprite):
 
         # 角色外觀與位置
         self.image = pygame.image.load("assets/player/archer.png").convert_alpha()
-        self.image = pygame.transform.scale(self.image, (200, 200))
+        self.image = pygame.transform.scale(self.image, (120, 120))
         self.original_image_right = self.image
         self.original_image_left = pygame.transform.flip(self.image, True, False)
         self.rect = self.image.get_rect(midbottom=pos)
@@ -79,6 +79,11 @@ class Archer(pygame.sprite.Sprite):
             arrow = Arrow(self.rect.centerx, self.rect.centery, direction, damage=20)
             projectile_group.add(arrow)
             self.attack_cooldown = 30
+
+    def take_damage(self, amount):
+        if self.invincible_timer == 0:
+            self.blood = max(0, self.blood - amount) # 使用 max() 確保血量不低於 0
+            self.invincible_timer = INVINCIBLE_DURATION # INVINCIBLE_DURATION 在 level3_game 中定義，這裡假設為 120
             
     def draw(self, screen):
         # 如果處於無敵狀態，加上半透明效果
