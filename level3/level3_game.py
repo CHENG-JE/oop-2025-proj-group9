@@ -233,20 +233,23 @@ def update_level3(player, screen):
         # 繪製當前血量 (綠色)
         pygame.draw.rect(screen, (0, 255, 0), (bar_x, bar_y, current_bar_width, bar_height))
         
-        # --- 新增：繪製血條標題 ---
+        # --- 新增：繪製怪物血條標題 ---
         try:
-            # 載入自訂字體檔案
-            font_path = "assets/fonts/Cinzel/static/Cinzel-Regular.ttf"
-            title_font = pygame.font.Font(font_path, 22) # 22 是字體大小，可以隨意調整
+            font_path = "assets/fonts/Cinzel-Regular.ttf"
+            title_font = pygame.font.Font(font_path, 22)
         except FileNotFoundError:
-            # 如果找不到字體檔案，就使用系統預設字體，避免程式閃退
             print(f"警告：找不到字體檔案 {font_path}，將使用預設字體。")
             title_font = pygame.font.SysFont(None, 24)
+        
+        # === 改正 1：設定字體為粗體和斜體 ===
+        title_font.bold = True
+        title_font.italic = True
             
         title_text = "Primordial bathysmal vishap"
         title_surface = title_font.render(title_text, True, (255, 255, 255))
         
-        # 將標題放在血條正上方的中間位置
+        # === 改正 2：設定文字對齊血條左側 ===
         title_rect = title_surface.get_rect()
-        title_rect.midbottom = (bar_x + bar_width / 2, bar_y)
+        # 將文字的左下角(bottomleft)對齊血條的左上角(topleft)
+        title_rect.bottomleft = (bar_x, bar_y) 
         screen.blit(title_surface, title_rect)
