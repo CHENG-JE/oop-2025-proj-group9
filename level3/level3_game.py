@@ -86,7 +86,7 @@ def handle_game_over(screen, main_player, win):
     
     main_player.reset_image()
     main_player.current_map = "game_map"
-    main_player.rect.center = (420, 180)
+    main_player.rect.center = (660, 110)
     main_player.resize_image((100, 100))
     if win:
         main_player.blood = archer.blood # 返回時繼承血量
