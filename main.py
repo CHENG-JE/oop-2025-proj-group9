@@ -6,8 +6,9 @@ import lobby.shop as shop, lobby.game_map as game_map
 import level1.level1_game as level1_game
 import level2.level2_game as level2_game
 import level3.level3_game as level3_game
-import pause # 導入暫停選單
+import pause
 
+# (save/load 函式不變)
 def save_player_data_list(players, filename="player_data.json"):
     with open(filename, "w") as f: json.dump([p.to_dict() for p in players], f, indent=4)
 def load_player_data(filename="player_data.json"):
@@ -31,61 +32,66 @@ if not players: pygame.quit(); sys.exit()
 current_player = show_login_screen(players)
 current_player.rect.center = (400, 500); current_player.current_map = "lobby"
 
-# --- 新增暫停狀態 ---
 is_paused = False
-
 running = True
 clock = pygame.time.Clock()
 
 while running:
+    # === 改正：將 shop 的事件處理加回事件迴圈 ===
     events = pygame.event.get()
     for event in events:
         if event.type == pygame.QUIT: running = False
         
-        # --- 新增：統一的 ESC 鍵處理 ---
+        # 統一的 ESC 鍵處理
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_ESCAPE:
                 if current_player.current_map in ["level1", "level2", "level3"]:
-                    is_paused = not is_paused # 在關卡中，切換暫停狀態
+                    is_paused = not is_paused
                 elif current_player.current_map == "shop":
-                    current_player.current_map = "lobby" # 在商店中，返回大廳
+                    current_player.current_map = "lobby"
 
+        # 根據地圖處理對應的事件
         if current_player.current_map == "lobby":
             target_map = current_player.check_portal_trigger(event)
             if target_map == "exit": running = False
             elif target_map: current_player.current_map = target_map
+        elif current_player.current_map == "shop":
+            # 將事件傳遞給 shop 模組處理
+            shop.handle_events(event, current_player)
 
     # --- 狀態更新與繪圖 ---
     keys = pygame.key.get_pressed()
     
     if is_paused:
-        # === 改正：呼叫時傳入當前關卡的名稱 ===
         action = pause.show(screen, current_player.current_map)
-        
-        # 根據回傳的結果執行對應動作 (menu 的處理邏輯已移至 pause.py)
-        if action == "continue":
-            is_paused = False
+        if action == "continue": is_paused = False
         elif action == "restart":
             if current_player.current_map == "level1": level1_game.init_level1(current_player)
             elif current_player.current_map == "level2": level2_game.init_level2(current_player)
             elif current_player.current_map == "level3": level3_game.init_level3(current_player)
             is_paused = False
         elif action == "leave":
-            current_player.current_map = "game_map"
-            current_player.reset_image(); current_player.rect.center = (420, 180)
+            current_player.current_map = "game_map"; current_player.reset_image(); current_player.rect.center = (420, 180)
             is_paused = False
+        elif action == "menu":
+            pause.show_rules_screen(screen, current_player.current_map)
 
     else:
         # 如果遊戲未暫停，執行正常的遊戲邏輯
         game_status = None
         current_level_name = current_player.current_map
         
-        # 繪製當前畫面
+        # 繪製與邏輯更新
         if current_player.current_map == "lobby":
             current_player.handle_input(keys); screen.blit(background, (0, 0)); current_player.draw(screen)
+        
         elif current_player.current_map == "shop":
+            # shop 的 handle_input (A/D/Enter) 已在事件迴圈中處理
+            # render 負責繪製畫面
             shop.render(screen, current_player)
+
         elif current_player.current_map == "game_map":
+            # ... (game_map 邏輯不變)
             current_player.handle_input(keys); game_map.render(screen, current_player)
             level1_zone = pygame.Rect(50, 475, 150, 40); level2_zone = pygame.Rect(400, 90, 100, 90); level3_zone = pygame.Rect(610, 80, 100, 50)
             if level1_zone.collidepoint(current_player.rect.center) and keys[pygame.K_RETURN]:
@@ -97,27 +103,15 @@ while running:
             font = pygame.font.SysFont(None, 36); prompt_text = font.render("Press Enter to start the game", True, (255, 255, 255))
             if any(zone.collidepoint(current_player.rect.center) for zone in [level1_zone, level2_zone, level3_zone]): screen.blit(prompt_text, (300, 550))
         
-        # 呼叫關卡更新函式並接收狀態
         elif current_player.current_map == "level1": game_status = level1_game.update_level1(screen, current_player)
         elif current_player.current_map == "level2": game_status = level2_game.update_level2(current_player, screen)
         elif current_player.current_map == "level3": game_status = level3_game.update_level3(screen, current_player)
 
         # 處理遊戲結束
-        if game_status in ["win", "lose"]:
-            win_condition = (game_status)
-            if win_condition:
-                if current_level_name == "level1": current_player.money += 100; current_player.exp += 20; evel_return_pos = (120, 490)
-                elif current_level_name == "level3": current_player.money += 500; level_return_pos = (660, 110)
-            else: # lose
-                if current_level_name == "level1": current_player.money = max(0, current_player.money - 20)
-                elif current_level_name == "level3": current_player.money = max(0, current_player.money - 300); level_return_pos = (660, 110)
-                current_player.blood = 100
-            
-            # 返回地圖
-            current_player.current_map = "game_map"
-            current_player.reset_image()
-            current_player.rect.center = level_return_pos
-
+        if game_status == "game_over":
+            is_paused = False
+            pass
+        
     pygame.display.flip()
     clock.tick(60)
 
