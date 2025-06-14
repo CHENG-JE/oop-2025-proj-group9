@@ -58,52 +58,15 @@ def init_level3(main_player):
     enemy_group.add(monster)
     all_sprites.add(monster)
 
-def handle_game_over(screen, main_player, win):
-    # (此函式邏輯不變，但注意它現在接收主玩家 main_player)
-    font = pygame.font.SysFont(None, 60)
-    if win:
-        text1 = font.render("You Win!", True, (0, 255, 0))
-        text2_str = "You got $500"
-        main_player.money += 300
-    else:
-        text1 = font.render("You were defeated!", True, (255, 0, 0))
-        text2_str = "You lose $300"
-        main_player.money = max(0, main_player.money - 100)
-
-    # ... (後續等待畫面邏輯不變)
-    text2 = pygame.font.SysFont(None, 40).render(text2_str, True, (255, 255, 255))
-    text3 = pygame.font.SysFont(None, 30).render("Press any key to return to map...", True, (255, 255, 255))
-    screen.blit(text1, (SCREEN_WIDTH//2 - text1.get_width()//2, SCREEN_HEIGHT//2 - 60))
-    screen.blit(text2, (SCREEN_WIDTH//2 - text2.get_width()//2, SCREEN_HEIGHT//2))
-    screen.blit(text3, (SCREEN_WIDTH//2 - text3.get_width()//2, SCREEN_HEIGHT//2 + 50))
-    pygame.display.flip()
-    waiting = True
-    while waiting:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                pygame.quit()
-                sys.exit()
-            if event.type == pygame.KEYDOWN:
-                waiting = False
-    
-    main_player.reset_image()
-    main_player.current_map = "game_map"
-    main_player.rect.center = (660, 110)
-    main_player.resize_image((100, 100))
-    if win:
-        main_player.blood = archer.blood # 返回時繼承血量
-    else:
-        main_player.blood = 100
-
 def update_level3(screen, main_player):
     # 遊戲結束判斷
     if archer.blood <= 0:
-        handle_game_over(screen, main_player, win=False)
-        return
+        main_player.blood = archer.blood # 同步一下最終血量
+        return "lose"
     if not enemy_group:
-        handle_game_over(screen, main_player, win=True)
-        return
-
+        main_player.blood = archer.blood # 同步一下最終血量
+        return "win"
+    
     # 更新物件
     keys = pygame.key.get_pressed()
     archer.update(keys, platform_group, player_projectile_group)
@@ -146,3 +109,5 @@ def update_level3(screen, main_player):
     monster_effect_group.draw(screen)
     
     if monster: monster.draw_health_bar(screen)
+    
+    return None
