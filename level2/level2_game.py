@@ -91,13 +91,13 @@ def update_level2(player, screen):
         if not hasattr(enemy, 'shoot_timer'):
             enemy.shoot_timer = 0
         enemy.shoot_timer += 1
-        if enemy.shoot_timer >= 60 and random.randint(1, 90) == 1:
-            if 20 > player.kills >=10: 
-                laser = Laser(enemy.rect.centerx, enemy.rect.bottom, "down", 5, (255,255,255,180), 5, 30, 20)
-            elif player.kills >=20:
+        if enemy.shoot_timer >= 40  and random.randint(1, 90) == 1:
+            if 20 > player.kills >=10: #fastenemy
+                laser = Laser(enemy.rect.centerx, enemy.rect.bottom, "down", 6, (255,255,255,180), 5, 30, 20)
+            elif player.kills >=20: #spaceship
                 laser = Laser(enemy.rect.centerx, enemy.rect.bottom, "down", 1.5, (255,255,255,180), 5, 30, 5)
-            else:
-                laser = Laser(enemy.rect.centerx, enemy.rect.bottom, "down", 2, (255,255,255,180), 5, 30, 10)
+            else: #basic
+                laser = Laser(enemy.rect.centerx, enemy.rect.bottom, "down", 4, (255,255,255,180), 5, 30, 10)
             enemy_lasers.add(laser)
             enemy.shoot_timer = 0
     enemy_lasers.update()

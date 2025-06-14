@@ -80,9 +80,9 @@ class Player:
         # level3 的平台跳躍移動邏輯在 level3_game.py 中處理
         print("KEYDOWN:", (self.rect.centerx, self.rect.centery))  # 檢測座標用
         if self.current_map == "lobby":
-            speed = 5
+            speed =10
         else: 
-            speed = 5
+            speed = 10
         if keys[pygame.K_a] and self.can_move_to_dx(-5) and self.rect.left > -50:
             self.rect.x -= speed
         if keys[pygame.K_d] and self.can_move_to_dx(5) and self.rect.right < 850:
