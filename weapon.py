@@ -64,22 +64,21 @@ class MonsterBeam(pygame.sprite.Sprite):
             self.kill()
 
 class Shockwave(pygame.sprite.Sprite):
-    def __init__(self, center_pos, width, damage, stage):
+    # === 改正：__init__ 方法新增 lifetime 參數 ===
+    def __init__(self, center_pos, width, damage, stage, lifetime=60): # 預設持續 1 秒
         super().__init__()
         try:
             self.image = pygame.image.load("assets/weapon/shockwave.png").convert_alpha()
         except pygame.error:
             self.image = pygame.Surface((width, 30)); self.image.fill((100, 100, 255))
         
-        # 讓圖片寬度與怪物相同
         original_aspect_ratio = self.image.get_height() / self.image.get_width()
         new_height = int(width * original_aspect_ratio)
         self.image = pygame.transform.scale(self.image, (width, new_height))
         
         self.rect = self.image.get_rect(center=center_pos)
-        self.lifetime = 60 # 持續 1 秒
+        self.lifetime = lifetime # 使用傳入的持續時間
         
-        # 新增傷害和階段屬性
         self.damage = damage
         self.stage = stage
         
