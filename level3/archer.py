@@ -94,9 +94,9 @@ class Archer(pygame.sprite.Sprite):
 
         # 繪製左上角的玩家狀態列
         font = pygame.font.SysFont(None, 28)
-        money_text = font.render(f"Money: ${self.money}", True, (255, 255, 0))
-        hp_text = font.render(f"HP: {int(self.blood)}/{self.max_blood}", True, (0, 255, 0))
-        exp_text = font.render(f"EXP: {self.exp}", True, (0, 255, 255))
+        money_text = font.render(f"Money: ${self.money}", True, (255, 255, 255))
+        hp_text = font.render(f"HP: {int(self.blood)}/{self.max_blood}", True, (255, 255, 255))
+        exp_text = font.render(f"EXP: {self.exp}", True, (255, 255, 255))
         
         screen.blit(money_text, (20, 20))
         screen.blit(hp_text, (20, 45))
