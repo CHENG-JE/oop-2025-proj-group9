@@ -81,9 +81,14 @@ class Droplet(pygame.sprite.Sprite):
         
     def draw_ui(self, screen):
         font = pygame.font.SysFont(None, 28)
-        money_text = font.render(f"Money: ${self.money}", True, (255, 255, 0))
-        hp_text = font.render(f"HP: {int(self.blood)}/{self.max_blood}", True, (0, 255, 0))
-        exp_text = font.render(f"EXP: {self.exp}", True, (0, 255, 255))
+        
+        # === 改正：將所有字體顏色改為 (255, 255, 255) ===
+        white_color = (255, 255, 255)
+        
+        money_text = font.render(f"Money: ${self.money}", True, white_color)
+        hp_text = font.render(f"HP: {int(self.blood)}/{self.max_blood}", True, white_color)
+        exp_text = font.render(f"EXP: {self.exp}", True, white_color)
+        
         screen.blit(money_text, (20, 20))
         screen.blit(hp_text, (20, 45))
         screen.blit(exp_text, (20, 70))
