@@ -4,6 +4,7 @@ import pygame
 import random
 from level2.basic_fighter import BasicEnemyFighter, Item
 from weapon import Laser
+import win_or_lose
 #from basic_fighter import BasicEnemyFighter
 #from basic_fighter import Item
 
@@ -118,38 +119,8 @@ def update_level2(player, screen):
                 player.blood -= 5
             enemy.kill()
             if player.blood <= 0:
-                #玩家輸了
-                print("Player defeated")
-                screen.fill((0, 0, 0))
-                font = pygame.font.SysFont(None, 48)
-                line1 = font.render(f"You were defeated. Total kills: {player.kills}", True, (255, 0, 0))
-                line2 = font.render(f"You lose $100 & all EXP", True, (255, 0, 0))
-                line3 = font.render("    Press L to leave!", True, (255, 0, 0))
-
-                # 顯示兩行文字，第二行往下偏移約 50 px
-                screen.blit(line1, (SCREEN_WIDTH // 2 - line1.get_width() // 2, SCREEN_HEIGHT // 2 - 40))
-                screen.blit(line2, (SCREEN_WIDTH // 2 - line2.get_width() // 2, SCREEN_HEIGHT // 2 + 10))
-                screen.blit(line3, (SCREEN_WIDTH // 2 - line2.get_width() // 2, SCREEN_HEIGHT // 2 + 60))
-                pygame.display.flip()
-
-                waiting = True
-                while waiting:
-                    for event in pygame.event.get():
-                        if event.type == pygame.QUIT:
-                            pygame.quit()
-                            sys.exit()
-                        if event.type == pygame.KEYDOWN:
-                            player.reset_image()
-                            player.current_map = "game_map"
-                            player.rect.center = (460, 170)
-                            player.resize_image((100, 100))
-                            player.blood = 100
-                            player.exp = 0
-                            player.money -=100
-                            player.kills = 0
-                            waiting = False
-                            return
-
+                win_or_lose.display(screen, player, False, "level2")
+                return "game_over"
     # --- 繪製所有物件 ---
     player.draw(screen)
     laser_group.draw(screen)
@@ -188,72 +159,13 @@ def update_level2(player, screen):
     for hit in hits:
         player.blood -= 10
         if player.blood <= 0:
-            #玩家輸了
-            print("Player defeated")
-            screen.fill((0, 0, 0))
-            font = pygame.font.SysFont(None, 48)
-            line1 = font.render(f"You were defeated. Total kills: {player.kills}", True, (255, 0, 0))
-            line2 = font.render(f"You lose $100 & all EXP", True, (255, 0, 0))
-            line3 = font.render("    Press L to leave!", True, (255, 0, 0))
-
-            # 顯示兩行文字，第二行往下偏移約 50 px
-            screen.blit(line1, (SCREEN_WIDTH // 2 - line1.get_width() // 2, SCREEN_HEIGHT // 2 - 40))
-            screen.blit(line2, (SCREEN_WIDTH // 2 - line2.get_width() // 2, SCREEN_HEIGHT // 2 + 10))
-            screen.blit(line3, (SCREEN_WIDTH // 2 - line2.get_width() // 2, SCREEN_HEIGHT // 2 + 60))
-            pygame.display.flip()
-
-            waiting = True
-            while waiting:
-                for event in pygame.event.get():
-                    if event.type == pygame.QUIT:
-                        pygame.quit()
-                        sys.exit()
-                    if event.type == pygame.KEYDOWN:
-                        player.reset_image()
-                        player.current_map = "game_map"
-                        player.rect.center = (460, 170)  # 設定指定位置
-                        player.resize_image((100, 100))  # 根據需要重新縮放圖片
-                        player.blood = 100
-                        player.money -=100
-                        player.exp = 0
-                        player.kills = 0
-                        waiting = False
-                        return
+            win_or_lose.display(screen, player, False, "level2")
+            return "game_over"
                     
     #玩家贏了
-    if player.kills == 40 :
-        screen.fill((0, 0, 0))
-        font = pygame.font.SysFont(None, 48)
-        line1 = font.render(f"Victory! Total kills: {player.kills}", True, (255, 0, 0))
-        line2 = font.render(f"You got $1000 & 100EXP", True, (255, 0, 0))
-        line3 = font.render("    Press L to leave!", True, (255, 0, 0))
-
-        # 顯示兩行文字，第二行往下偏移約 50 px
-        screen.blit(line1, (SCREEN_WIDTH // 2 - line1.get_width() // 2, SCREEN_HEIGHT // 2 - 40))
-        screen.blit(line2, (SCREEN_WIDTH // 2 - line2.get_width() // 2, SCREEN_HEIGHT // 2 + 10))
-        screen.blit(line3, (SCREEN_WIDTH // 2 - line2.get_width() // 2, SCREEN_HEIGHT // 2 + 60))
-        pygame.display.flip()
-
-        waiting = True
-        while waiting:
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    pygame.quit()
-                    sys.exit()
-                if event.type == pygame.KEYDOWN:
-                    player.reset_image()
-                    player.current_map = "game_map"
-                    player.rect.center = (445, 125)  # 設定指定位置
-                    player.resize_image((100, 100))  # 根據需要重新縮放圖片
-                    player.blood = player.blood
-                    if player.exp <= 900:
-                        player.exp += 100
-                    else:
-                        player.exp = 1000
-                    player.money += 1000
-                    player.kills = 0
-                    waiting = False
-                    return
+    if player.kills >= 40:
+        win_or_lose.display(screen, player, True, "level2")
+        return "game_over"
 
 
     # --- 撿寶物處理 ---
@@ -268,6 +180,7 @@ def update_level2(player, screen):
     font = pygame.font.SysFont(None, 28)
     kill_text = font.render(f"Kills: {player.kills}/40", True, (255, 255, 0))
     screen.blit(kill_text, (SCREEN_WIDTH - 120, 20))
+    return None
 
 if __name__ == "__main__":
     pygame.init()
