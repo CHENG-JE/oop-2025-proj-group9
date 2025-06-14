@@ -59,21 +59,22 @@ while running:
     keys = pygame.key.get_pressed()
     
     if is_paused:
-        # 如果遊戲暫停，顯示並處理暫停選單
-        pause.draw_menu(screen)
-        action = pause.handle_input()
-        if action:
-            if action == "continue": is_paused = False
-            elif action == "restart":
-                if current_player.current_map == "level1": level1_game.init_level1(current_player)
-                elif current_player.current_map == "level2": level2_game.init_level2(current_player)
-                elif current_player.current_map == "level3": level3_game.init_level3(current_player)
-                is_paused = False
-            elif action == "leave":
-                current_player.current_map = "game_map"; current_player.reset_image(); current_player.rect.center = (420, 180)
-                is_paused = False
-            elif action == "menu":
-                pause.show_rules_screen(screen)
+        # === 改正：呼叫時傳入當前關卡的名稱 ===
+        action = pause.show(screen, current_player.current_map)
+        
+        # 根據回傳的結果執行對應動作 (menu 的處理邏輯已移至 pause.py)
+        if action == "continue":
+            is_paused = False
+        elif action == "restart":
+            if current_player.current_map == "level1": level1_game.init_level1(current_player)
+            elif current_player.current_map == "level2": level2_game.init_level2(current_player)
+            elif current_player.current_map == "level3": level3_game.init_level3(current_player)
+            is_paused = False
+        elif action == "leave":
+            current_player.current_map = "game_map"
+            current_player.reset_image(); current_player.rect.center = (420, 180)
+            is_paused = False
+
     else:
         # 如果遊戲未暫停，執行正常的遊戲邏輯
         game_status = None
@@ -103,12 +104,9 @@ while running:
 
         # 處理遊戲結束
         if game_status in ["win", "lose"]:
-            # 根據關卡和輸贏來設定獎懲
-            win_condition = (game_status == "win")
-            level_return_pos = (120, 490) # 預設 L1 返回點
-
+            win_condition = (game_status)
             if win_condition:
-                if current_level_name == "level1": current_player.money += 100; current_player.exp += 20
+                if current_level_name == "level1": current_player.money += 100; current_player.exp += 20; evel_return_pos = (120, 490)
                 elif current_level_name == "level3": current_player.money += 500; level_return_pos = (660, 110)
             else: # lose
                 if current_level_name == "level1": current_player.money = max(0, current_player.money - 20)
