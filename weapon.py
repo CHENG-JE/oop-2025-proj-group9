@@ -41,14 +41,42 @@ class Arrow(pygame.sprite.Sprite):
 class MonsterBeam(pygame.sprite.Sprite):
     def __init__(self, start_pos, target_pos):
         super().__init__()
+        
+        # 1. 載入原始圖片並儲存，以備旋轉使用
         try:
-            self.image = pygame.image.load("assets/weapon/beam.gif").convert_alpha()
+            self.original_image = pygame.image.load("assets/weapon/beam.gif").convert_alpha()
         except pygame.error:
-            self.image = pygame.Surface((30, 10))
-            self.image.fill((255, 100, 255))
-            
-        self.image = pygame.transform.scale(self.image, (50, 20))
+            self.original_image = pygame.Surface((50, 20), pygame.SRCALPHA)
+            self.original_image.fill((255, 100, 255))
+        
+        self.original_image = pygame.transform.scale(self.original_image, (50, 20))
+        
+        # 2. 計算射擊角度
+        # math.atan2 會回傳從 start_pos 指向 target_pos 的向量與X軸正向的夾角(弧度)
+        angle_rad = math.atan2(target_pos[1] - start_pos[1], target_pos[0] - start_pos[0])
+        # 將弧度轉換為角度
+        angle_deg = math.degrees(angle_rad)
+        
+        # 3. 旋轉圖片以對準目標
+        # Pygame 的 rotate 是逆時針旋轉。我們的圖預設朝左(180度)，所以需要公式 `180 - angle` 來校正
+        self.image = pygame.transform.rotate(self.original_image, 180 - angle_deg)
+        
         self.rect = self.image.get_rect(center=start_pos)
+        
+        # 4. 根據角度計算移動向量 (恢復追蹤彈邏輯)
+        arrow_speed = 15
+        speed = arrow_speed * 0.7
+        self.vx = math.cos(angle_rad) * speed
+        self.vy = math.sin(angle_rad) * speed
+
+    def update(self):
+        # 根據計算好的向量移動
+        self.rect.x += self.vx
+        self.rect.y += self.vy
+        
+        # 飛出畫面就自動刪除
+        if not (0 <= self.rect.centerx <= 800 and 0 <= self.rect.centery <= 600):
+            self.kill()
         
         angle = math.atan2(target_pos[1] - start_pos[1], target_pos[0] - start_pos[0])
         arrow_speed = 15
