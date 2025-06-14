@@ -2,6 +2,7 @@
 import pygame
 import sys, os
 import random
+import win_or_lose
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
@@ -106,12 +107,13 @@ def init_level1(main_player):
 def update_level1(screen, main_player):
     global maze_timer, round_count
     
+    # === 改正：結束時呼叫 win_or_lose.handle_game_over ===
     if not droplet or droplet.blood <= 0:
-        main_player.blood = droplet.blood # 同步最終血量
-        return "lose"
+        win_or_lose.display(screen, main_player, False, "level1")
+        return "game_over"
     if pygame.sprite.spritecollide(droplet, portal_group, False):
-        main_player.blood = droplet.blood # 同步最終血量
-        return "win"
+        win_or_lose.display(screen, main_player, True, "level1")
+        return "game_over"
     
     maze_timer -= 1
     if maze_timer <= 0:
