@@ -106,9 +106,13 @@ def init_level1(main_player):
 def update_level1(screen, main_player):
     global maze_timer, round_count
     
-    if not droplet or droplet.blood <= 0: handle_game_over(screen, main_player, win=False); return
-    if pygame.sprite.spritecollide(droplet, portal_group, False): handle_game_over(screen, main_player, win=True); return
-
+    if not droplet or droplet.blood <= 0:
+        main_player.blood = droplet.blood # 同步最終血量
+        return "lose"
+    if pygame.sprite.spritecollide(droplet, portal_group, False):
+        main_player.blood = droplet.blood # 同步最終血量
+        return "win"
+    
     maze_timer -= 1
     if maze_timer <= 0:
         round_count += 1
@@ -137,22 +141,4 @@ def update_level1(screen, main_player):
     font = pygame.font.SysFont(None, 36)
     round_text = font.render(f"Round: {round_count}", True, (255, 255, 255))
     screen.blit(round_text, (SCREEN_WIDTH - round_text.get_width() - 20, 20))
-
-def handle_game_over(screen, main_player, win):
-    # (此函式不變)
-    if win: main_player.money += 100; main_player.exp += 20
-    else: main_player.money = max(0, main_player.money - 20)
-    if droplet: main_player.blood = droplet.blood
-    font = pygame.font.SysFont(None, 60)
-    if win: text1 = font.render("You Win!", True, (0, 255, 0)); text2_str = "You got $100 & 20 EXP"
-    else: text1 = font.render("You were lost...", True, (255, 0, 0)); text2_str = "You lose $20"
-    text2 = pygame.font.SysFont(None, 40).render(text2_str, True, (255, 255, 255))
-    text3 = pygame.font.SysFont(None, 30).render("Press any key to return to map...", True, (255, 255, 255))
-    screen.blit(text1, (SCREEN_WIDTH//2-text1.get_width()//2, SCREEN_HEIGHT//2-60)); screen.blit(text2, (SCREEN_WIDTH//2-text2.get_width()//2, SCREEN_HEIGHT//2)); screen.blit(text3, (SCREEN_WIDTH//2-text3.get_width()//2, SCREEN_HEIGHT//2+50))
-    pygame.display.flip()
-    waiting = True
-    while waiting:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT: pygame.quit(); sys.exit()
-            if event.type == pygame.KEYDOWN: waiting = False
-    main_player.reset_image(); main_player.current_map = "game_map"; main_player.rect.center = (120, 490)
+    return None
