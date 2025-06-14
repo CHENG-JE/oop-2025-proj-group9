@@ -7,7 +7,6 @@ from weapon import MonsterBeam, Shockwave
 class Monster(pygame.sprite.Sprite):
     def __init__(self, pos, boundaries):
         super().__init__()
-        # ... (__init__ 方法不變，省略)
         original_image_loaded = pygame.image.load("assets/enemy/monster.png").convert_alpha()
         scaled_image = pygame.transform.scale(original_image_loaded, (200, 200))
         self.image_left = scaled_image
@@ -28,7 +27,6 @@ class Monster(pygame.sprite.Sprite):
 
 
     def update(self, platforms, player, monster_projectile_group, monster_effect_group):
-        # Y軸物理模擬 (不變)
         if self.state not in ['jumping_up', 'falling_down']:
             self.vy += self.gravity
             self.rect.y += self.vy
@@ -45,15 +43,10 @@ class Monster(pygame.sprite.Sprite):
                     monster_projectile_group.add(beam)
                     self.attack_cooldown = 42
                 else:
-                    self.state = 'shockwave_stage1'
-        
-        elif self.state == 'shockwave_stage1':
-            wave = Shockwave(self.rect.midbottom, self.rect.width, damage=30, stage=1, lifetime=42)
-            monster_effect_group.add(wave)
-            self.target_pos = (player.rect.centerx, self.rect.midbottom[1])
-            self.state = 'moving_to_target'
+                    self.state = 'moving_to_target'
 
         elif self.state == 'moving_to_target':
+            self.target_pos = (player.rect.centerx, self.rect.midbottom[1]) # 目標位置為玩家的水平位置
             if self.target_pos:
                 dx = self.target_pos[0] - self.rect.centerx
                 direction = 1 if dx > 0 else -1
@@ -77,11 +70,10 @@ class Monster(pygame.sprite.Sprite):
                     self.state = 'shockwave_stage2'; break
 
         elif self.state == 'shockwave_stage2':
-            wave = Shockwave(self.rect.midbottom, self.rect.width, damage=50, stage=2, lifetime=60)
+            wave = Shockwave(self.rect.midbottom, self.rect.width, damage=80, stage=2, lifetime=60)
             monster_effect_group.add(wave)
             self.state = 'idle'
-            # === 改正：將冷卻時間設為 0，讓下一次攻擊決策立刻開始 ===
-            self.attack_cooldown = 30
+            self.attack_cooldown = 30 #震地後搖0.5秒
         
         # 轉向判斷 (不變)
         if self.state in ['idle', 'moving_to_target']:
@@ -89,7 +81,6 @@ class Monster(pygame.sprite.Sprite):
             else: self.image = self.image_left
             
     def draw_health_bar(self, screen):
-        # (此函式不變)
         bar_x, bar_y, bar_width, bar_height = 250, 80, 450, 20
         health_percent = max(0, self.health / self.max_health)
         current_bar_width = bar_width * health_percent
