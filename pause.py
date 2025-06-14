@@ -68,7 +68,7 @@ def show_rules_screen(screen, level_name):
     
     # 繪製關卡規則
     for i, line in enumerate(rules_text):
-        text_surf = font.render(line, True, (255, 255, 255))
+        text_surf = font.render(line, True, (0, 0, 0))  
         text_rect = text_surf.get_rect(center=(400, 200 + i * 50))
         screen.blit(text_surf, text_rect)
         
