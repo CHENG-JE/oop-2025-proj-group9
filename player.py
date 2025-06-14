@@ -20,7 +20,9 @@ class Player:
                 pygame.Rect(280,485,600,200), #下方河流
                 pygame.Rect(280,375,70,200), #bridge下
                 pygame.Rect(570,435,600,200), #下方河流右1
-                pygame.Rect(630,405,600,200) #下方河流右2
+                pygame.Rect(630,405,600,200), #下方河流右2
+                pygame.Rect(260,265,40,30),  #上方河流左1
+                pygame.Rect(290,195,50,30)  #上方河流左1
 
             ],
             "level2":[
