@@ -12,6 +12,7 @@ def render(screen, current_player=None):
             current_player.map_initialized["game_map"] = False  # 讓下次進入會重設位置
             current_player.rect.center = (570, 325)  # 你想要的新位置
             current_player.current_map = "lobby"
+            
             return
 
         if current_player.current_map == "game_map":

@@ -18,7 +18,9 @@ class Player:
                 ],
             "game_map": [
                 pygame.Rect(280,485,600,200), #下方河流
-                pygame.Rect(280,375,70,200) #下方河流s
+                pygame.Rect(280,375,70,200), #bridge下
+                pygame.Rect(570,435,600,200), #下方河流右1
+                pygame.Rect(630,405,600,200) #下方河流右2
 
             ],
             "level2":[
