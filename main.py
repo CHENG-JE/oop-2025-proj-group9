@@ -118,7 +118,7 @@ while running:
     elif current_player.current_map == "level1":
         level1_game.update_level1(screen, current_player)
     elif current_player.current_map == "level2":
-        level2_game.update_level2(screen, current_player)
+        level2_game.update_level2(current_player, screen) 
     elif current_player.current_map == "level3":
         level3_game.update_level3(screen, current_player)
     else:
