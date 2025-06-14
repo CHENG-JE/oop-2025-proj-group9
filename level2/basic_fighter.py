@@ -3,7 +3,7 @@ import pygame
 import random
 
 class BasicEnemyFighter(pygame.sprite.Sprite):
-    def __init__(self, position, speed=1, hp=30, attack_power=5):
+    def __init__(self, position, speed=3, hp=30, attack_power=5):
         super().__init__()
         self.image = pygame.image.load("assets/enemy/fighter1.png")
         self.image = pygame.transform.scale(self.image, (100, 100))  # ← 需指定回 self.image
