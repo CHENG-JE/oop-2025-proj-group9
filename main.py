@@ -8,6 +8,25 @@ import level2.level2_game as level2_game
 import level3.level3_game as level3_game
 import pause
 
+# 音樂設定
+pygame.mixer.init()
+
+# 統一背景音樂播放函式
+def play_bgm_for_map(map_name):
+    bgm_files = {
+        #"lobby": os.path.join("assets", "music", "lobby_bgm.mp3"),
+        #"level1": os.path.join("assets", "music", "level1_bgm.mp3"),
+        #"level2": os.path.join("assets", "music", "level2_bgm.mp3"),
+        "level3": os.path.join("assets", "music", "lev3.mp3"),
+        #"shop": os.path.join("assets", "music", "shop_bgm.mp3"),
+        #"game_map": os.path.join("assets", "music", "map_bgm.mp3")
+    }
+    if map_name in bgm_files:
+        if not pygame.mixer.music.get_busy():
+            pygame.mixer.music.load(bgm_files[map_name])
+            pygame.mixer.music.set_volume(0.5)
+            pygame.mixer.music.play(-1)
+
 # (save/load 函式不變)
 def save_player_data_list(players, filename="player_data.json"):
     with open(filename, "w") as f: json.dump([p.to_dict() for p in players], f, indent=4)
@@ -80,6 +99,13 @@ while running:
         # 如果遊戲未暫停，執行正常的遊戲邏輯
         game_status = None
         current_level_name = current_player.current_map
+        # 統一背景音樂切換
+        static_last_map = getattr(play_bgm_for_map, "last_map", None)
+        if static_last_map != current_level_name:
+            if pygame.mixer.music.get_busy():
+                pygame.mixer.music.stop()
+            play_bgm_for_map(current_level_name)
+            play_bgm_for_map.last_map = current_level_name
         
         # 繪製與邏輯更新
         if current_player.current_map == "lobby":
@@ -103,9 +129,12 @@ while running:
             font = pygame.font.SysFont(None, 36); prompt_text = font.render("Press Enter to start the game", True, (255, 255, 255))
             if any(zone.collidepoint(current_player.rect.center) for zone in [level1_zone, level2_zone, level3_zone]): screen.blit(prompt_text, (300, 550))
         
-        elif current_player.current_map == "level1": game_status = level1_game.update_level1(screen, current_player)
-        elif current_player.current_map == "level2": game_status = level2_game.update_level2(current_player, screen)
-        elif current_player.current_map == "level3": game_status = level3_game.update_level3(screen, current_player)
+        elif current_player.current_map == "level1":
+            game_status = level1_game.update_level1(screen, current_player)
+        elif current_player.current_map == "level2":
+            game_status = level2_game.update_level2(current_player, screen)
+        elif current_player.current_map == "level3":
+            game_status = level3_game.update_level3(screen, current_player)
 
         # 處理遊戲結束
         if game_status == "game_over":
