@@ -16,7 +16,7 @@ def play_bgm_for_map(map_name):
     bgm_files = {
         #"lobby": os.path.join("assets", "music", "lobby_bgm.mp3"),
         #"level1": os.path.join("assets", "music", "level1_bgm.mp3"),
-        #"level2": os.path.join("assets", "music", "level2_bgm.mp3"),
+        "level2": os.path.join("assets", "music", "lev2.mp3"),
         "level3": os.path.join("assets", "music", "lev3.mp3"),
         #"shop": os.path.join("assets", "music", "shop_bgm.mp3"),
         #"game_map": os.path.join("assets", "music", "map_bgm.mp3")
