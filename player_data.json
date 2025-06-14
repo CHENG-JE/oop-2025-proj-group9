@@ -12,8 +12,8 @@
         "current_map": "game_map",
         "money": 9660,
         "max_blood": 1000,
-        "blood": 200,
-        "exp": 0
+        "blood": 530,
+        "exp": 390
     },
     {
         "image_path": "assets/player/player2.png",
@@ -29,6 +29,6 @@
         "money": 1000,
         "max_blood": 100,
         "blood": 100,
-        "exp": 10
+        "exp": 0
     }
 ]
