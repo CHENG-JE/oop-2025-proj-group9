@@ -2,18 +2,18 @@
     {
         "image_path": "assets/player/player1.png",
         "position": [
-            660,
-            110
+            115,
+            415
         ],
         "image_size": [
             150,
             150
         ],
-        "current_map": "level3",
-        "money": 10500,
+        "current_map": "shop",
+        "money": 10000,
         "max_blood": 1000,
-        "blood": 100,
-        "exp": 280
+        "blood": 1000,
+        "exp": 530
     },
     {
         "image_path": "assets/player/player2.png",
