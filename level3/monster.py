@@ -7,11 +7,11 @@ from weapon import MonsterBeam, Shockwave
 class Monster(pygame.sprite.Sprite):
     def __init__(self, pos, boundaries):
         super().__init__()
-        # ... (init 方法的其他部分不變)
+        # ... (__init__ 方法不變，省略)
         original_image_loaded = pygame.image.load("assets/enemy/monster.png").convert_alpha()
         scaled_image = pygame.transform.scale(original_image_loaded, (200, 200))
-        self.image_right = pygame.transform.flip(scaled_image, True, False) # 假設原圖朝左
         self.image_left = scaled_image
+        self.image_right = pygame.transform.flip(self.image_left, True, False)
         self.image = self.image_left
         self.rect = self.image.get_rect(midbottom=pos)
         self.max_health = 1000
@@ -26,6 +26,7 @@ class Monster(pygame.sprite.Sprite):
         self.jump_gravity = 0.68
         self.jump_speed = -18.5
 
+
     def update(self, platforms, player, monster_projectile_group, monster_effect_group):
         # Y軸物理模擬 (不變)
         if self.state not in ['jumping_up', 'falling_down']:
@@ -35,20 +36,22 @@ class Monster(pygame.sprite.Sprite):
                 if self.rect.colliderect(platform.rect) and self.vy > 0:
                     self.rect.bottom = platform.rect.top; self.vy = 0; break
         
-        # === AI 狀態機 (已移除 shockwave_stage1) ===
+        # 狀態機 AI
         if self.state == 'idle':
             self.attack_cooldown -= 1
             if self.attack_cooldown <= 0:
-                if random.random() < 0.8: # 80% 機率光波
+                if random.random() < 0.8:
                     beam = MonsterBeam(self.rect.center, player.rect.center)
                     monster_projectile_group.add(beam)
                     self.attack_cooldown = 42
-                else: # 20% 機率震地
-                    # 直接記錄玩家位置並開始移動，不再產生第一段震波
-                    self.target_pos = (player.rect.centerx, self.rect.midbottom[1])
-                    self.state = 'moving_to_target'
+                else:
+                    self.state = 'shockwave_stage1'
         
-        # `shockwave_stage1` 的 elif 區塊已被完全刪除
+        elif self.state == 'shockwave_stage1':
+            wave = Shockwave(self.rect.midbottom, self.rect.width, damage=30, stage=1, lifetime=42)
+            monster_effect_group.add(wave)
+            self.target_pos = (player.rect.centerx, self.rect.midbottom[1])
+            self.state = 'moving_to_target'
 
         elif self.state == 'moving_to_target':
             if self.target_pos:
@@ -74,10 +77,11 @@ class Monster(pygame.sprite.Sprite):
                     self.state = 'shockwave_stage2'; break
 
         elif self.state == 'shockwave_stage2':
-            # 這裡的 stage=2 只是為了與第一階段的傷害做區別，你可以視為最終的震波
             wave = Shockwave(self.rect.midbottom, self.rect.width, damage=50, stage=2, lifetime=60)
             monster_effect_group.add(wave)
-            self.state = 'idle'; self.attack_cooldown = 180
+            self.state = 'idle'
+            # === 改正：將冷卻時間設為 0，讓下一次攻擊決策立刻開始 ===
+            self.attack_cooldown = 30
         
         # 轉向判斷 (不變)
         if self.state in ['idle', 'moving_to_target']:
