@@ -1,11 +1,10 @@
 # level3/level3_game.py
 import pygame
 import sys, os
+import win_or_lose
 
-# 確保可以從父目錄導入模組
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
-# 從新檔案中導入類別
 from level3.platform import Platform
 from level3.archer import Archer
 from level3.monster import Monster
@@ -59,13 +58,13 @@ def init_level3(main_player):
     all_sprites.add(monster)
 
 def update_level3(screen, main_player):
-    # 遊戲結束判斷
+    # === 改正：結束時呼叫 win_or_lose.handle_game_over ===
     if archer.blood <= 0:
-        main_player.blood = archer.blood # 同步一下最終血量
-        return "lose"
+        win_or_lose.display(screen, main_player, False, "level3")
+        return "game_over"
     if not enemy_group:
-        main_player.blood = archer.blood # 同步一下最終血量
-        return "win"
+        win_or_lose.display(screen, main_player, True, "level3")
+        return "game_over"
     
     # 更新物件
     keys = pygame.key.get_pressed()
@@ -109,5 +108,5 @@ def update_level3(screen, main_player):
     monster_effect_group.draw(screen)
     
     if monster: monster.draw_health_bar(screen)
-    
+
     return None
