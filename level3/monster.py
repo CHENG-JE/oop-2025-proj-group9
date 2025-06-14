@@ -8,40 +8,35 @@ class Monster(pygame.sprite.Sprite):
     def __init__(self, pos, boundaries):
         super().__init__()
         
-        # === 改正 1：修正圖片方向邏輯 ===
+        # === 根據你的描述，修正圖片方向的定義 ===
         original_image_loaded = pygame.image.load("assets/enemy/monster.png").convert_alpha()
         scaled_image = pygame.transform.scale(original_image_loaded, (200, 200))
         
-        # 假設你的原圖 monster.png 是朝左的
+        # 你的原圖是朝左的
         self.image_left = scaled_image
         # 將朝左的圖水平翻轉，得到朝右的圖
         self.image_right = pygame.transform.flip(self.image_left, True, False)
         
-        # 初始時，怪物在右邊，應該朝左看
+        # 由於怪物初始在右邊 (x=550)，玩家在左邊 (x=250)，所以初始應該朝左
         self.image = self.image_left
         
         self.rect = self.image.get_rect(midbottom=pos)
         
+        # --- 後續的屬性設定不變 ---
         self.max_health = 1000
         self.health = self.max_health
         self.vy = 0
-
-        # 狀態機與計時器
         self.state = 'idle'
         self.attack_cooldown = 120
         self.target_pos = None
-
-        # 物理常數
-        self.gravity = 2.2      # 正常(下落)重力
-        self.move_speed = 15 
+        self.gravity = 2.2
+        self.move_speed = 15
         self.left_boundary, self.right_boundary = boundaries
-        
-        # 非對稱跳躍用的物理常數
-        self.jump_gravity = 0.68  # 上升時的慢速重力
-        self.jump_speed = -18.5 # 上升時的初始速度
+        self.jump_gravity = 0.68
+        self.jump_speed = -18.5
 
     def update(self, platforms, player, monster_projectile_group, monster_effect_group):
-        # Y軸物理模擬 (在非跳躍狀態下)
+        # Y軸物理模擬 (不變)
         if self.state not in ['jumping_up', 'falling_down']:
             self.vy += self.gravity
             self.rect.y += self.vy
@@ -49,7 +44,7 @@ class Monster(pygame.sprite.Sprite):
                 if self.rect.colliderect(platform.rect) and self.vy > 0:
                     self.rect.bottom = platform.rect.top; self.vy = 0; break
         
-        # === 改正 2：恢復完整的跳躍攻擊流程 ===
+        # 狀態機 AI (不變)
         if self.state == 'idle':
             self.attack_cooldown -= 1
             if self.attack_cooldown <= 0:
@@ -71,45 +66,36 @@ class Monster(pygame.sprite.Sprite):
                 dx = self.target_pos[0] - self.rect.centerx
                 direction = 1 if dx > 0 else -1
                 is_stuck_at_wall = ((self.rect.left <= self.left_boundary and direction == -1) or (self.rect.right >= self.right_boundary and direction == 1))
-                
-                # 到達目的地後，進入跳躍，而不是直接攻擊
                 if abs(dx) < self.move_speed or is_stuck_at_wall:
-                    self.state = 'jumping_up' # <--- 進入上升跳躍狀態
-                    self.vy = self.jump_speed   # <--- 設定起跳速度
+                    self.state = 'jumping_up'; self.vy = self.jump_speed
                 else:
                     self.rect.x += self.move_speed * direction
                     if self.rect.left < self.left_boundary: self.rect.left = self.left_boundary
                     if self.rect.right > self.right_boundary: self.rect.right = self.right_boundary
         
-        # --- 新增回來的跳躍狀態 ---
         elif self.state == 'jumping_up':
-            self.vy += self.jump_gravity # 使用上升的慢速重力
-            self.rect.y += self.vy
-            if self.vy >= 0: # 到達頂點
-                self.state = 'falling_down'
+            self.vy += self.jump_gravity; self.rect.y += self.vy
+            if self.vy >= 0: self.state = 'falling_down'
 
         elif self.state == 'falling_down':
-            self.vy += self.gravity # 使用下落的快速重力
-            self.rect.y += self.vy
+            self.vy += self.gravity; self.rect.y += self.vy
             for platform in platforms:
                 if self.rect.colliderect(platform.rect) and self.vy > 0:
                     self.rect.bottom = platform.rect.top; self.vy = 0
-                    self.state = 'shockwave_stage2' # 落地後才進入最終攻擊
-                    break
-        # --- 跳躍狀態結束 ---
+                    self.state = 'shockwave_stage2'; break
 
         elif self.state == 'shockwave_stage2':
             wave = Shockwave(self.rect.midbottom, self.rect.width, damage=50, stage=2, lifetime=60)
             monster_effect_group.add(wave)
-            self.state = 'idle'
-            self.attack_cooldown = 180
+            self.state = 'idle'; self.attack_cooldown = 180
         
-        # 轉向判斷
+        # === 轉向判斷 (現在的邏輯會正確對應你的圖片) ===
         if self.state in ['idle', 'moving_to_target']:
-            if self.rect.centerx < player.rect.centerx:
-                self.image = self.image_right
-            else:
-                self.image = self.image_left
+            # 玩家在怪物右邊 (player.x > monster.x)
+            if player.rect.centerx > self.rect.centerx:
+                self.image = self.image_right # 怪物朝右看
+            else: # 玩家在怪物左邊或重疊
+                self.image = self.image_left # 怪物朝左看
             
     def draw_health_bar(self, screen):
         # (此函式不變)
