@@ -110,9 +110,13 @@ def handle_events(event, player):
                     purchase_message = "Bought Blood Pack: HP +50"
 
                 elif selected_index == 2:
+                    if player.exp +50 >1000:
+                        purchase_message = "Max EXP"
+                    else:
+                        purchase_message = "Bought XP Book: EXP +50"
                     player.exp += 50
+                    player.exp = min(player.exp , 1000)
                     #player.money += 1000 #需要測試時再取消註解
-                    purchase_message = "Bought XP Book: EXP +50"
                 #purchase_message = f"Bought:{item_names[selected_index]}"
             else:
                 purchase_message = "No enough cash"
