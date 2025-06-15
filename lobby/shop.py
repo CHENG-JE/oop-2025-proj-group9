@@ -70,6 +70,7 @@ def handle_events(event, player):
     global selected_index
     global purchase_message
     purchase_sound = pygame.mixer.Sound("assets/music/purchase_sound_effect.mp3")
+    no_cash_sound = pygame.mixer.Sound("assets/music/no_enough_cash.mp3")
     if event.type == pygame.KEYDOWN:
         print(f"Key pressed: {event.key}")  # 除錯列印
         if event.key == pygame.K_a:
@@ -115,6 +116,7 @@ def handle_events(event, player):
                 #purchase_message = f"Bought:{item_names[selected_index]}"
             else:
                 purchase_message = "No enough cash"
+                no_cash_sound.play()
 
             # 已根據購買項目給予效果，避免重複處理
 
