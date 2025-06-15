@@ -106,11 +106,19 @@ def handle_events(event, player):
                         purchase_message = "Bought Gift: Bad luck... HP=50 and Reset everything."
                         
                 elif selected_index == 1:
-                    purchase_sound.play()
-                    player.money -= price
-                    player.blood += 50
-                    player.blood = min(player.blood, player.max_blood)
-                    purchase_message = "Bought Blood Pack: HP +50"
+                    if player.blood == player.max_blood:
+                        purchase_message = "HP already full, Purchase failed"
+                        wrong_sound.play()
+                    elif player.blood + 50 >= player.max_blood:
+                        purchase_sound.play()
+                        player.money -= price
+                        player.blood = player.max_blood
+                        purchase_message = "HP fully restored"
+                    else:
+                        purchase_sound.play()
+                        player.money -= price
+                        player.blood += 50
+                        purchase_message = "Bought Blood Pack: HP +50"
 
                 elif selected_index == 2:
                     if player.exp == 1000:
