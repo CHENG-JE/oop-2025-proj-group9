@@ -71,6 +71,7 @@ def handle_events(event, player):
     global purchase_message
     purchase_sound = pygame.mixer.Sound("assets/music/purchase_sound_effect.mp3")
     no_cash_sound = pygame.mixer.Sound("assets/music/no_enough_cash.mp3")
+    wrong_sound = pygame.mixer.Sound("assets/music/wrong.mp3")
     if event.type == pygame.KEYDOWN:
         print(f"Key pressed: {event.key}")  # 除錯列印
         if event.key == pygame.K_a:
@@ -83,9 +84,9 @@ def handle_events(event, player):
             price = item_prices[selected_index]
 
             if player.money >= price:
-                purchase_sound.play()
                 # 根據購買項目給予不同訊息
                 if selected_index == 0:
+                    purchase_sound.play()
                     player.money -= price
                     choice = np.random.rand()
                     if choice > 0.8:
@@ -105,6 +106,7 @@ def handle_events(event, player):
                         purchase_message = "Bought Gift: Bad luck... HP=50 and Reset everything."
                         
                 elif selected_index == 1:
+                    purchase_sound.play()
                     player.money -= price
                     player.blood += 50
                     player.blood = min(player.blood, player.max_blood)
@@ -113,10 +115,13 @@ def handle_events(event, player):
                 elif selected_index == 2:
                     if player.exp == 1000:
                         purchase_message = "Max EXP, Purchase failed"
+                        wrong_sound.play()
                     elif player.exp +50 > 1000:
+                        purchase_sound.play()
                         player.money -= price
                         purchase_message = "Max EXP"
                     else:
+                        purchase_sound.play()
                         purchase_message = "Bought XP Book: EXP +50"
                         player.money -= price
                     player.exp += 50
