@@ -69,6 +69,7 @@ def render(screen, player):
 def handle_events(event, player):
     global selected_index
     global purchase_message
+    purchase_sound = pygame.mixer.Sound("assets/sounds/purchase_sound_effect")
     if event.type == pygame.KEYDOWN:
         print(f"Key pressed: {event.key}")  # 除錯列印
         if event.key == pygame.K_a:
@@ -77,7 +78,7 @@ def handle_events(event, player):
             selected_index = (selected_index + 1) % 3
         elif event.key == pygame.K_RETURN:
             item_prices = [100,150,200]
-            item_names = ["Gift","Blood","Experience book"]
+            #item_names = ["Gift","Blood","Experience book"]
             price = item_prices[selected_index]
 
             if player.money >= price:
