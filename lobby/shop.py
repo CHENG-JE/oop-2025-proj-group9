@@ -112,6 +112,9 @@ def handle_events(event, player):
                 elif selected_index == 2:
                     if player.exp +50 >1000:
                         purchase_message = "Max EXP"
+                    elif player.exp == 1000:
+                        purchase_message = "Max EXP, Purchase failed"
+                        player.money += price
                     else:
                         purchase_message = "Bought XP Book: EXP +50"
                     player.exp += 50
