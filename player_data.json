@@ -2,8 +2,8 @@
     {
         "image_path": "assets/player/player1.png",
         "position": [
-            720,
-            470
+            730,
+            445
         ],
         "image_size": [
             150,
@@ -12,7 +12,7 @@
         "current_map": "lobby",
         "money": 0,
         "max_blood": 1380,
-        "blood": 280,
+        "blood": 270,
         "exp": 370
     },
     {
