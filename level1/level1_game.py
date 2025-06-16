@@ -15,7 +15,8 @@ from .lightning import Lightning
 SCREEN_WIDTH, SCREEN_HEIGHT = 800, 600
 GRID_WIDTH, GRID_HEIGHT = 20, 15
 CELL_SIZE = SCREEN_WIDTH // GRID_WIDTH
-ROUND_DURATION = 6 * 60 # 每回合 6 秒
+# === 修正：回合時間從 6 秒延長至 12 秒 ===
+ROUND_DURATION = 12 * 60 
 
 # === 全域物件 ===
 wall_group = pygame.sprite.Group()
@@ -41,7 +42,7 @@ def setup_new_round(main_player):
                 if 0 <= y < GRID_HEIGHT and 0 <= x < GRID_WIDTH + 1: v_walls[y][x] = False
     
     create_walls_from_grid(h_walls, v_walls)
-    spawn_portal(h_walls, v_walls)
+    spawn_portal()
 
 def generate_maze():
     h_walls = [[True for _ in range(GRID_WIDTH)] for _ in range(GRID_HEIGHT + 1)]
@@ -89,22 +90,28 @@ def create_walls_from_grid(h_walls, v_walls):
         for x in range(GRID_WIDTH + 1):
             if v_walls[y][x]: wall_group.add(VerticalWall(x * CELL_SIZE, y * CELL_SIZE, CELL_SIZE))
 
-def spawn_portal(h_walls, v_walls):
+def spawn_portal():
     portal_group.empty()
     valid_spawns = []
+    
     for y in range(1, GRID_HEIGHT - 1):
         for x in range(1, GRID_WIDTH - 1):
             is_in_rings = (x in [1, 2, GRID_WIDTH-3, GRID_WIDTH-2] or y in [1, 2, GRID_HEIGHT-3, GRID_HEIGHT-2])
-            is_open = not (h_walls[y][x] or h_walls[y+1][x] or v_walls[y][x] or v_walls[y][x+1])
-            if is_in_rings and is_open: valid_spawns.append((x, y))
+            
+            if is_in_rings:
+                valid_spawns.append((x, y))
+
     if valid_spawns:
         spawn_pos = random.choice(valid_spawns)
         global portal
-        portal = Portal(spawn_pos[0] * CELL_SIZE, spawn_pos[1] * CELL_SIZE, CELL_SIZE)
+        portal_x = spawn_pos[0] * CELL_SIZE + (CELL_SIZE - 30) / 2
+        portal_y = spawn_pos[1] * CELL_SIZE + (CELL_SIZE - 30) / 2
+        portal = Portal(portal_x, portal_y, CELL_SIZE)
         portal_group.add(portal)
 
 def init_level1(main_player):
-    global round_count, maze_timer
+    global round_count, maze_timer, portal
+    portal = None
     for group in [wall_group, portal_group, lightning_group]: group.empty()
         
     round_count = 1
@@ -112,9 +119,7 @@ def init_level1(main_player):
     setup_new_round(main_player)
 
 def update_level1(screen, main_player, keys):
-    global maze_timer, round_count
-    
-    main_player.handle_input(keys, walls=wall_group) # 傳入牆壁給玩家判斷碰撞
+    global maze_timer, round_count, portal
     
     if main_player.blood <= 0:
         win_or_lose.display(screen, main_player, False, "level1")
@@ -135,15 +140,14 @@ def update_level1(screen, main_player, keys):
         
     lightning_group.update()
     
-    # --- 繪圖區 ---
     screen.blit(lev1_bg, (0, 0))
     wall_group.draw(screen)
     portal_group.draw(screen)
-    main_player.draw(screen) # === 修正：直接畫 main_player ===
+    main_player.draw(screen)
     lightning_group.draw(screen)
     
-    # === 修正：繪製UI ===
     ui.draw_player_stats(screen, main_player)
-    ui.draw_level_hud(screen, "level1", round_count=round_count)
+    # === 修正：將 maze_timer 傳遞給 HUD 函式 ===
+    ui.draw_level_hud(screen, "level1", round_count=round_count, time_left=maze_timer)
     
     return None
