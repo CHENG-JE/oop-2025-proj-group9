@@ -69,6 +69,9 @@ def render(screen, player):
 def handle_events(event, player):
     global selected_index
     global purchase_message
+    purchase_sound = pygame.mixer.Sound("assets/music/purchase_sound_effect.mp3")
+    no_cash_sound = pygame.mixer.Sound("assets/music/no_enough_money.mp3")
+    wrong_sound = pygame.mixer.Sound("assets/music/wrong.mp3")
     if event.type == pygame.KEYDOWN:
         print(f"Key pressed: {event.key}")  # 除錯列印
         if event.key == pygame.K_a:
@@ -77,13 +80,14 @@ def handle_events(event, player):
             selected_index = (selected_index + 1) % 3
         elif event.key == pygame.K_RETURN:
             item_prices = [100,150,200]
-            item_names = ["Gift","Blood","Experience book"]
+            #item_names = ["Gift","Blood","Experience book"]
             price = item_prices[selected_index]
 
             if player.money >= price:
-                player.money -= price
                 # 根據購買項目給予不同訊息
                 if selected_index == 0:
+                    purchase_sound.play()
+                    player.money -= price
                     choice = np.random.rand()
                     if choice > 0.8:
                         player.max_blood += 50
@@ -102,17 +106,39 @@ def handle_events(event, player):
                         purchase_message = "Bought Gift: Bad luck... HP=50 and Reset everything."
                         
                 elif selected_index == 1:
-                    player.blood += 50
-                    player.blood = min(player.blood, player.max_blood)
-                    purchase_message = "Bought Blood Pack: HP +50"
+                    if player.blood == player.max_blood:
+                        purchase_message = "HP already full, Purchase failed"
+                        wrong_sound.play()
+                    elif player.blood + 50 >= player.max_blood:
+                        purchase_sound.play()
+                        player.money -= price
+                        player.blood = player.max_blood
+                        purchase_message = "HP fully restored"
+                    else:
+                        purchase_sound.play()
+                        player.money -= price
+                        player.blood += 50
+                        purchase_message = "Bought Blood Pack: HP +50"
 
                 elif selected_index == 2:
+                    if player.exp == 1000:
+                        purchase_message = "Max EXP, Purchase failed"
+                        wrong_sound.play()
+                    elif player.exp +50 > 1000:
+                        purchase_sound.play()
+                        player.money -= price
+                        purchase_message = "Max EXP"
+                    else:
+                        purchase_sound.play()
+                        purchase_message = "Bought XP Book: EXP +50"
+                        player.money -= price
                     player.exp += 50
+                    player.exp = min(player.exp , 1000)
                     #player.money += 1000 #需要測試時再取消註解
-                    purchase_message = "Bought XP Book: EXP +50"
                 #purchase_message = f"Bought:{item_names[selected_index]}"
             else:
                 purchase_message = "No enough cash"
+                no_cash_sound.play()
 
             # 已根據購買項目給予效果，避免重複處理
 

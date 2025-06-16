@@ -2,6 +2,8 @@
 import pygame
 import random
 
+all_items = pygame.sprite.Group()
+
 class BasicEnemyFighter(pygame.sprite.Sprite):
     def __init__(self, position, speed=3, hp=30, attack_power=5):
         super().__init__()
