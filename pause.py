@@ -1,4 +1,4 @@
-# pause.py
+# pause.py (修正版)
 import pygame
 import sys
 
@@ -14,24 +14,23 @@ except pygame.error:
 BUTTON_TEXTS = ["Continue", "Restart", "Leave", "Menu"]
 BUTTON_RECTS = [pygame.Rect(270, 140 + i * 80, 260, 50) for i in range(len(BUTTON_TEXTS))]
 
-# === 新增：所有關卡的規則文字 ===
-# 使用字典來存放，key 是關卡名稱，value 是規則文字列表
+# === 所有關卡的規則文字 ===
 RULES = {
     "level1": [
         "W/A/S/D: Move Up/Left/Down/Right",
-        "Goal: Reach the portal within 6 seconds.",
+        "Goal: Reach the portal within 12 seconds.",
         "The maze resets every round, ",
         "and you will be struck by lightning."
     ],
     "level2": [
         "W/A/S/D: Move Up/Left/Down/Right",
         "Goal: Defeat 40 enemy planes.",
-        "Bonus: Heal 50 HP for every 10 kills.",
-        "Defeated enemies may drop items that grant EXP."
+        "Bonus: Heal 20 HP for every 10 kills.",
+        "Eat the yellow blocks to grant 10 EXP."
     ],
     "level3": [
         "A/D: Move Left/Right | SPACE: Jump",
-        "J: Attack (Archery)",
+        "ENTER: Attack",
         "Goal: Defeat the boss.",
         "Evade its beams and shockwaves."
     ]
@@ -40,7 +39,6 @@ RULES = {
 
 # --- 繪圖函式 ---
 def draw_menu(screen, selected_index):
-    # (此函式不變)
     screen.blit(pause_bg, (0, 0))
     font = pygame.font.SysFont(None, 50)
     mouse_pos = pygame.mouse.get_pos()
@@ -55,21 +53,35 @@ def draw_menu(screen, selected_index):
         text_rect = text_surf.get_rect(center=rect.center)
         screen.blit(text_surf, text_rect)
 
-# === 改正：讓規則畫面可以顯示對應關卡的規則 ===
 def show_rules_screen(screen, level_name):
     font = pygame.font.SysFont(None, 40)
-    # 從 RULES 字典中，根據關卡名稱獲取對應的規則文字
     rules_text = RULES.get(level_name, ["No rules found for this level."])
-    
-    # 固定的返回提示
     footer_text = "=== Press ESC to return to the pause menu ==="
     
     screen.blit(pause_bg, (0, 0))
     
-    # 繪製關卡規則
+    # === 修正：新增灰色背景板 ===
+    # 1. 計算背景板的尺寸和位置
+    panel_width = 600
+    # 根據文字行數和間距計算高度，並增加一些邊距
+    panel_height = len(rules_text) * 50 + 40 
+    panel_x = (screen.get_width() - panel_width) / 2
+    # 讓面板的頂部從 150px 開始
+    panel_y = 150 
+    
+    # 2. 建立一個帶有透明度的 Surface 作為背景板
+    panel_surf = pygame.Surface((panel_width, panel_height), pygame.SRCALPHA)
+    panel_surf.fill((50, 50, 50, 200)) # 半透明的深灰色
+    
+    # 3. 繪製背景板
+    screen.blit(panel_surf, (panel_x, panel_y))
+    
+    # 繪製關卡規則文字
     for i, line in enumerate(rules_text):
-        text_surf = font.render(line, True, (0, 0, 0))  
-        text_rect = text_surf.get_rect(center=(400, 200 + i * 50))
+        # === 修正：將文字顏色從 (0, 0, 0) 改為 (255, 255, 255) ===
+        text_surf = font.render(line, True, (255, 255, 255))
+        # 文字的位置基於背景板的位置來計算
+        text_rect = text_surf.get_rect(center=(400, panel_y + 40 + i * 50))
         screen.blit(text_surf, text_rect)
         
     # 繪製返回提示
@@ -87,23 +99,22 @@ def show_rules_screen(screen, level_name):
             if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
                 waiting = False
 
-# === 改正：主函式現在會接收 level_name ===
 def show(screen, level_name):
     selected_index = 0
     clock = pygame.time.Clock()
 
     while True:
-        # 事件處理
         for event in pygame.event.get():
             if event.type == pygame.QUIT: pygame.quit(); sys.exit()
             
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE: return "continue"
-                if event.key == pygame.K_w: selected_index = (selected_index - 1 + len(BUTTON_TEXTS)) % len(BUTTON_TEXTS)
-                if event.key == pygame.K_s: selected_index = (selected_index + 1) % len(BUTTON_TEXTS)
+                if event.key == pygame.K_w or event.key == pygame.K_UP: 
+                    selected_index = (selected_index - 1 + len(BUTTON_TEXTS)) % len(BUTTON_TEXTS)
+                if event.key == pygame.K_s or event.key == pygame.K_DOWN: 
+                    selected_index = (selected_index + 1) % len(BUTTON_TEXTS)
                 if event.key == pygame.K_RETURN:
                     action = BUTTON_TEXTS[selected_index].lower()
-                    # 如果是 menu，直接在這裡處理，而不是返回 main.py
                     if action == "menu":
                         show_rules_screen(screen, level_name)
                     else:
@@ -118,12 +129,12 @@ def show(screen, level_name):
                         else:
                             return action
         
-        # 滑鼠懸停效果
         mouse_pos = pygame.mouse.get_pos()
         for i, rect in enumerate(BUTTON_RECTS):
-            if rect.collidepoint(mouse_pos): selected_index = i; break
+            if rect.collidepoint(mouse_pos):
+                selected_index = i
+                break
 
-        # 繪圖
         draw_menu(screen, selected_index)
         pygame.display.flip()
         clock.tick(60)

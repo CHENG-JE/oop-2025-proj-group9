@@ -1,113 +1,111 @@
-# weapon.py
+# weapon.py (最終修正版)
 import pygame
 import math
 
-class Laser(pygame.sprite.Sprite):
-    # ... (Laser 類別不變)
+class Projectile(pygame.sprite.Sprite):
+    """
+    所有武器（投射物）的基礎類別
+    """
+    def __init__(self, image, center_pos, damage=0):
+        super().__init__()
+        self.image = image
+        self.rect = self.image.get_rect(center=center_pos)
+        self.damage = damage
+
+    def update(self):
+        # 共通的邊界檢查，如果投射物飛出畫面，則自動銷毀
+        if self.rect.bottom < 0 or self.rect.top > 600 or \
+           self.rect.right < 0 or self.rect.left > 800:
+            self.kill()
+
+
+class Laser(Projectile):
+    """
+    玩家和基本敵機發射的雷射光束。
+    """
     def __init__(self, x, y, direction="up", speed=10, color=(255, 0, 0, 180), width=5, height=30, damage=50):
-        super().__init__()
-        self.image = pygame.Surface((width, height), pygame.SRCALPHA)
-        pygame.draw.rect(self.image, color, (0, 0, width, height))
-        self.rect = self.image.get_rect(center=(x, y))
+        image = pygame.Surface((width, height), pygame.SRCALPHA)
+        pygame.draw.rect(image, color, (0, 0, width, height))
+        super().__init__(image, center_pos=(x, y), damage=damage)
         self.direction = direction
         self.speed = speed
-        self.damage = damage
+
     def update(self):
-        if self.direction == "right": self.rect.x += self.speed
-        elif self.direction == "left": self.rect.x -= self.speed
-        elif self.direction == "up": self.rect.y -= self.speed
+        if self.direction == "up": self.rect.y -= self.speed
         elif self.direction == "down": self.rect.y += self.speed
-        if (self.rect.right < 0 or self.rect.left > 800 or self.rect.bottom < 0 or self.rect.top > 600):
-            self.kill()
+        super().update()
 
-class Arrow(pygame.sprite.Sprite):
-    # ... (Arrow 類別不變)
+
+class Arrow(Projectile):
+    """
+    Level 3 玩家發射的弓箭。
+    """
     def __init__(self, x, y, direction, speed=15, damage=20):
-        super().__init__()
-        self.image = pygame.image.load("assets/weapon/arrow.png").convert_alpha()
-        self.image = pygame.transform.scale(self.image, (100, 100))
+        image = pygame.image.load("assets/weapon/arrow.png").convert_alpha()
+        image = pygame.transform.scale(image, (100, 100))
+        if direction == "left":
+            image = pygame.transform.flip(image, True, False)
+        super().__init__(image, center_pos=(x, y), damage=damage)
         self.direction = direction
         self.speed = speed
-        self.damage = damage
-        if self.direction == "left":
-            self.image = pygame.transform.flip(self.image, True, False)
-        self.rect = self.image.get_rect(center=(x, y))
+
     def update(self):
         if self.direction == "right": self.rect.x += self.speed
         elif self.direction == "left": self.rect.x -= self.speed
-        if self.rect.right < 0 or self.rect.left > 800:
-            self.kill()
+        super().update()
 
-class MonsterBeam(pygame.sprite.Sprite):
+
+class MonsterBeam(Projectile):
+    """
+    Level 3 BOSS 發射的追蹤光束，傷害固定為 50。
+    """
     def __init__(self, start_pos, target_pos):
-        super().__init__()
-        
-        # 1. 載入原始圖片並儲存，以備旋轉使用
+        # 準備光束圖片和角度
         try:
-            self.original_image = pygame.image.load("assets/weapon/beam.gif").convert_alpha()
+            original_image = pygame.image.load("assets/weapon/beam.gif").convert_alpha()
         except pygame.error:
-            self.original_image = pygame.Surface((50, 20), pygame.SRCALPHA)
-            self.original_image.fill((255, 100, 255))
+            original_image = pygame.Surface((50, 20), pygame.SRCALPHA)
+            original_image.fill((255, 100, 255))
         
-        self.original_image = pygame.transform.scale(self.original_image, (50, 20))
+        original_image = pygame.transform.scale(original_image, (50, 20))
         
-        # 2. 計算射擊角度
-        # math.atan2 會回傳從 start_pos 指向 target_pos 的向量與X軸正向的夾角(弧度)
         angle_rad = math.atan2(target_pos[1] - start_pos[1], target_pos[0] - start_pos[0])
-        # 將弧度轉換為角度
         angle_deg = math.degrees(angle_rad)
+        image = pygame.transform.rotate(original_image, 180 - angle_deg)
         
-        # 3. 旋轉圖片以對準目標
-        # Pygame 的 rotate 是逆時針旋轉。我們的圖預設朝左(180度)，所以需要公式 `180 - angle` 來校正
-        self.image = pygame.transform.rotate(self.original_image, 180 - angle_deg)
-        
-        self.rect = self.image.get_rect(center=start_pos)
-        
-        # 4. 根據角度計算移動向量 (恢復追蹤彈邏輯)
-        arrow_speed = 15
-        speed = arrow_speed * 0.7
+        # === 修正：呼叫父類別時，將 damage 寫死為 50 ===
+        super().__init__(image, center_pos=start_pos, damage=50)
+
+        # MonsterBeam 特有的移動屬性
+        speed = 10.5
         self.vx = math.cos(angle_rad) * speed
         self.vy = math.sin(angle_rad) * speed
 
     def update(self):
-        # 根據計算好的向量移動
         self.rect.x += self.vx
         self.rect.y += self.vy
-        
-        # 飛出畫面就自動刪除
-        if not (0 <= self.rect.centerx <= 800 and 0 <= self.rect.centery <= 600):
-            self.kill()
-        
-        angle = math.atan2(target_pos[1] - start_pos[1], target_pos[0] - start_pos[0])
-        arrow_speed = 15
-        self.speed = arrow_speed * 0.5
-        self.vx = math.cos(angle) * self.speed
-        self.vy = math.sin(angle) * self.speed
+        super().update()
 
-    def update(self):
-        self.rect.x += self.vx
-        self.rect.y += self.vy
-        # 讓這個類別更獨立，不依賴外部的 screen 變數
-        if (self.rect.right < 0 or self.rect.left > 800 or self.rect.bottom < 0 or self.rect.top > 600):
-            self.kill()
 
-class Shockwave(pygame.sprite.Sprite):
-    # === 改正：__init__ 方法新增 lifetime 參數 ===
-    def __init__(self, center_pos, width, damage, stage, lifetime=60): # 預設持續 1 秒
-        super().__init__()
+class Shockwave(Projectile):
+    """
+    Level 3 BOSS 發射的震盪波。
+    """
+    def __init__(self, center_pos, width, damage, stage, lifetime=60):
+        # 準備震盪波圖片
         try:
-            self.image = pygame.image.load("assets/weapon/shockwave.png").convert_alpha()
+            image = pygame.image.load("assets/weapon/shockwave.png").convert_alpha()
         except pygame.error:
-            self.image = pygame.Surface((width, 30)); self.image.fill((100, 100, 255))
+            image = pygame.Surface((width, 30))
+            image.fill((100, 100, 255))
         
-        original_aspect_ratio = self.image.get_height() / self.image.get_width()
+        original_aspect_ratio = image.get_height() / image.get_width()
         new_height = int(width * original_aspect_ratio)
-        self.image = pygame.transform.scale(self.image, (width, new_height))
+        image = pygame.transform.scale(image, (width, new_height))
         
-        self.rect = self.image.get_rect(center=center_pos)
-        self.lifetime = lifetime # 使用傳入的持續時間
+        super().__init__(image, center_pos=center_pos, damage=damage)
         
-        self.damage = damage
+        self.lifetime = lifetime
         self.stage = stage
         
     def update(self):

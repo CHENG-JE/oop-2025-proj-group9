@@ -1,6 +1,7 @@
 # level1/droplet.py
 import pygame
 import math
+import ui
 
 class Droplet(pygame.sprite.Sprite):
     def __init__(self, start_pos, cell_size):
@@ -80,15 +81,5 @@ class Droplet(pygame.sprite.Sprite):
         self.blood = max(0, self.blood - amount)
         
     def draw_ui(self, screen):
-        font = pygame.font.SysFont(None, 28)
-        
-        # === 改正：將所有字體顏色改為 (255, 255, 255) ===
-        white_color = (255, 255, 255)
-        
-        money_text = font.render(f"Money: ${self.money}", True, white_color)
-        hp_text = font.render(f"HP: {int(self.blood)}/{self.max_blood}", True, white_color)
-        exp_text = font.render(f"EXP: {self.exp}", True, white_color)
-        
-        screen.blit(money_text, (20, 20))
-        screen.blit(hp_text, (20, 45))
-        screen.blit(exp_text, (20, 70))
+        # === 改正：呼叫 ui 模組來繪製狀態 ===
+        ui.draw_player_stats(screen, self)

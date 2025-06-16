@@ -59,7 +59,7 @@ def show_login_screen(players):
             orig_center = player.rect.center
             # 移動到選擇位置繪製
             player.rect.center = select_positions[i]
-            player.draw(screen , show_status = False)
+            player.draw(screen)
             if i == selected_index:
                 pygame.draw.rect(screen, (255, 255, 0), player.rect.inflate(10, 10), 3)
             # 恢復原始位置

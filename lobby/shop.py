@@ -1,5 +1,6 @@
 import pygame
 import numpy as np
+import ui
 # 載入背景
 background = pygame.image.load("assets/background/shop.png")
 background = pygame.transform.scale(background, (800, 600))
@@ -45,19 +46,9 @@ def render(screen, player):
     esc_text = esc_font.render("Press ESC to return to lobby", True, (255, 255, 255))
     screen.blit(esc_text, (520, 10))
 
-    # 顯示玩家金額在左上角
-    money_font = pygame.font.SysFont(None, 28)
-    money_text = money_font.render(f"Money: ${player.money}", True, (255, 255, 255))
-    screen.blit(money_text, (20, 20))
-
-    blood_font = pygame.font.SysFont(None, 28)
-    blood_text = blood_font.render(f"HP: {player.blood}/{player.max_blood}", True, (255, 255, 255))
-    screen.blit(blood_text, (20, 40))
-
-    exp_font = pygame.font.SysFont(None, 28)
-    exp_text = exp_font.render(f"EXP: {player.exp}/1000", True, (255, 255, 255))
-    screen.blit(exp_text, (20, 60))
-
+    # === 改正：呼叫 ui 模組來繪製狀態 ===
+    # 移除舊的 money_font, blood_font, exp_font 等程式碼
+    ui.draw_player_stats(screen, player)
 
     # 顯示購買訊息
     if purchase_message:
