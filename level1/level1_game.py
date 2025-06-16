@@ -123,9 +123,14 @@ def init_level1(main_player):
     global round_count, maze_timer, portal
     portal = None
     for group in [wall_group, portal_group, lightning_group]: group.empty()
-        
+    
     round_count = 1
     maze_timer = ROUND_DURATION
+
+    # 設定玩家初始位置
+    main_player.rect.center = (100, 305)
+    main_player.hitbox.center = main_player.rect.center
+
     setup_new_round(main_player)
 
 def update_level1(screen, main_player, keys):

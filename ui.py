@@ -14,7 +14,7 @@ def draw_player_stats(screen, player):
     
     money_text = font.render(f"Money: ${money}", True, white_color)
     hp_text = font.render(f"HP: {int(blood)}/{max_blood}", True, white_color)
-    exp_text = font.render(f"EXP: {exp}", True, white_color)
+    exp_text = font.render(f"EXP: {exp}/1000", True, white_color)
     
     screen.blit(money_text, (20, 20))
     screen.blit(hp_text, (20, 45))
