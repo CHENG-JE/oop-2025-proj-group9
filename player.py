@@ -1,172 +1,247 @@
+# player.py (最終修正版)
 import pygame
+import ui
+import math
 
 class Player:
     def __init__(self, image_path, position, size=(150, 150)):
+        # --- 核心屬性 ---
+        self.original_image_path = image_path
         self.image_size = size
-        self.original_image_path = image_path  # 儲存初始圖片路徑
         self.image = pygame.image.load(image_path).convert_alpha()
         self.image = pygame.transform.scale(self.image, size)
-        self.rect = self.image.get_rect()
-        self.rect.center = position
+        self.rect = self.image.get_rect(center=position)
+        
+        # --- 遊戲狀態 (保留您原始的數值) ---
         self.current_map = "lobby"
+        self.money = 500
+        self.max_blood = 100
+        self.blood = 100
+        self.exp = 0
+
+        # --- 行為與狀態控制 ---
+        self.facing_right = True
+        self.attack_cooldown = 0
+        self.invincible_timer = 0 # Level 3 需要此計時器，但不由通用方法控制
+        self.shoot_timer = 0      # for Level 2
+        self.kills = 0            # for Level 2
+        self.map_initialized = {"lobby": False, "game_map": False}
+
+        # --- 各關卡專用物理屬性 ---
+        # Level 1 (Droplet)
+        self.original_droplet_image = None
+        self.pos_vector = pygame.math.Vector2(position)
+        self.hitbox = pygame.Rect(0, 0, 16, 16)
+        
+        # Level 3 (Archer)
+        self.vy = 0
+        self.on_ground = False
+        self.gravity = 0.87
+        self.jump_speed = -20.8
+        self.move_speed = 7
+        self.original_image_right = self.image
+        self.original_image_left = pygame.transform.flip(self.image, True, False)
+        
+        # --- 地圖碰撞與觸發 ---
         self.blocked_areas = {
-            "lobby": [
-                pygame.Rect(0, 0, 775, 270), #wall
-                pygame.Rect(230, 286, 144, 20), #chair           
-                pygame.Rect(680, 325, 90, 55), #leave table                
-                pygame.Rect(70, 315, 110, 55), #vending machine         
-                ],
-            "game_map": [
-                pygame.Rect(280,485,600,200), #下方河流
-                pygame.Rect(280,375,70,200), #bridge下
-                pygame.Rect(570,435,600,200), #下方河流右1
-                pygame.Rect(630,405,600,200), #下方河流右2
-                pygame.Rect(260,265,40,30),  #上方河流左1
-                pygame.Rect(290,195,50,30)  #上方河流左1
-
-            ],
-            "level2":[
-
-            ]
-            #"level1":[] 如果有需要的話可以自己打上去
-            #"level3":[]
-
+            "lobby": [pygame.Rect(0, 0, 775, 270), pygame.Rect(230, 286, 144, 20), pygame.Rect(680, 325, 90, 55), pygame.Rect(70, 315, 110, 55)],
+            "game_map": [pygame.Rect(280,485,600,200), pygame.Rect(280,375,70,200), pygame.Rect(570,435,600,200), pygame.Rect(630,405,600,200), pygame.Rect(260,265,40,30), pygame.Rect(290,195,50,30)],
         }
-        if self.current_map == "lobby":
-            self.trigger_areas = [
+        self.trigger_areas = [
                 {"rect": pygame.Rect(60, 405, 110, 50), "message": "Do you want to buy something?", "pos": (20, 150), "target": "shop"},
                 {"rect": pygame.Rect(490, 315, 150, 50), "message": "Play the game NOW!", "pos": (440, 40), "target": "game_map"},
                 {"rect": pygame.Rect(655, 425, 200, 50), "message": "Exit Game?", "pos": (635, 320), "target": "exit"}
             ]
         self.current_trigger_info = None
-        self.money = 500 # 初始金額
 
-        self.max_blood = 100
-        self.blood = 100 #初始血量
-        self.exp = 0 #初始經驗值
-        self.map_initialized = {
-            "lobby": False,
-            "game_map": False
-        }
+    def set_level_mode(self, level_name, boundaries=(50, 750)):
+        self.current_map = level_name
+        
+        if level_name == "level1":
+            self.original_droplet_image = pygame.image.load("assets/player/droplet.png").convert_alpha()
+            self.image = pygame.transform.scale(self.original_droplet_image, (34, 17))
+            self.rect = self.image.get_rect(center=(400, 300))
+            self.pos_vector = pygame.math.Vector2(self.rect.center)
+            self.hitbox.center = self.rect.center
+        
+        elif level_name == "level2":
+            self.image = pygame.image.load("assets/player/fighter.png").convert_alpha()
+            self.resize_image((100, 100))
+            self.rect.center = (400, 500)
 
-        # === 為 Level 3 新增的屬性 ===
-        self.vy = 0  # 垂直速度
-        self.on_ground = False  # 是否在地面上
-        self.facing_right = True  # 面朝方向，True為右
-        self.attack_cooldown = 0  # 攻擊冷卻計時器
-        self.invincible_timer = 0 # 無敵計時器
+        elif level_name == "level3":
+            archer_img = pygame.image.load("assets/player/archer.png").convert_alpha()
+            self.original_image_right = pygame.transform.scale(archer_img, (120, 120))
+            self.original_image_left = pygame.transform.flip(self.original_image_right, True, False)
+            self.image = self.original_image_right
+            self.rect = self.image.get_rect(midbottom=(250, 500))
+            self.left_boundary, self.right_boundary = boundaries
+            self.vy = 0
+            self.on_ground = False
 
+        else:
+            self.reset_image()
 
-    def get_collision_rect(self):
-        shrink_ratio = 0.6 #比例
-        new_width = int(self.rect.width * shrink_ratio)
-        new_height = int(self.rect.height * shrink_ratio)
-        new_rect = pygame.Rect(0, 0, new_width, new_height)
-        new_rect.center = self.rect.center
-        return new_rect
+    def update(self, **kwargs):
+        # 更新所有計時器
+        if self.attack_cooldown > 0: self.attack_cooldown -= 1
+        if self.invincible_timer > 0: self.invincible_timer -= 1
+        
+        # 只在 Level 3 執行獨立的物理更新
+        if self.current_map == "level3":
+            self._update_physics_level3(kwargs.get('platforms', []))
 
-    def can_move_to_dx(self, dx):
-        future_rect = self.get_collision_rect().move(dx, 0)
-        for block in self.blocked_areas.get(self.current_map, []):
-            if future_rect.colliderect(block):
-                return False
-        return True
+    def handle_input(self, keys, **kwargs):
+        print("Player Position:", self.rect.center)
+        
+        if self.current_map == "level1":
+            self._handle_input_level1(keys, kwargs.get('walls', []))
+        elif self.current_map == "level2":
+            self._handle_input_level2(keys)
+        elif self.current_map == "level3":
+            self._handle_input_level3(keys, kwargs.get('projectile_group'))
+        else:
+            self._handle_input_lobby(keys)
 
-    def can_move_to_dy(self, dy):
-        future_rect = self.get_collision_rect().move(0, dy)
-        for block in self.blocked_areas.get(self.current_map, []):
-            if future_rect.colliderect(block):
-                return False
-        return True
+    def draw(self, screen):
+        # Level 3 受傷時會有閃爍效果
+        if self.current_map == 'level3' and self.invincible_timer > 0 and self.invincible_timer % 10 < 5:
+            pass # 透過不繪製來達成閃爍
+        else:
+            screen.blit(self.image, self.rect)
 
-    def handle_input(self, keys):
-        # 這個 handle_input 主要用於 lobby 和 level2 的俯視角移動
-        # level3 的平台跳躍移動邏輯在 level3_game.py 中處理
-        print("KEYDOWN:", (self.rect.centerx, self.rect.centery))  # 檢測座標用
-        if self.current_map == "lobby":
-            speed =10
-        else: 
-            speed = 10
-        if keys[pygame.K_a] and self.can_move_to_dx(-5) and self.rect.left > -50:
-            self.rect.x -= speed
-        if keys[pygame.K_d] and self.can_move_to_dx(5) and self.rect.right < 850:
-            self.rect.x += speed
-        if keys[pygame.K_w] and self.can_move_to_dy(-5) and self.rect.top > 0:
-            self.rect.y -= speed
-        if keys[pygame.K_s] and self.can_move_to_dy(5) and self.rect.bottom < 610:
-            self.rect.y += speed
-
-        self.check_trigger_area()
-
-    def draw(self, screen,show_status = True):
-        screen.blit(self.image, self.rect)
-        if self.current_trigger_info:
+        # 只在 Lobby 繪製觸發提示
+        if self.current_map == "lobby" and self.current_trigger_info:
             font = pygame.font.SysFont(None, 40)
             text = font.render(self.current_trigger_info["message"], True, (220, 220, 220))
             screen.blit(text, self.current_trigger_info["pos"])
-        if show_status:
-            money_font = pygame.font.SysFont(None, 28)
-            money_text = money_font.render(f"Money: ${self.money}", True, (250, 250, 250))  # 黃色金額
-            screen.blit(money_text, (20, 20))  # 左上角座標
+
+    # --- 各關卡的處理邏輯 ---
+    def _handle_input_level1(self, keys, walls):
+        move_vector = pygame.math.Vector2(0, 0)
+        if keys[pygame.K_w]: move_vector.y = -1
+        if keys[pygame.K_s]: move_vector.y = 1
+        if keys[pygame.K_a]: move_vector.x = -1
+        if keys[pygame.K_d]: move_vector.x = 1
+
+        if move_vector.length_squared() > 0:
+            move_vector.normalize_ip()
+            angle = move_vector.angle_to(pygame.math.Vector2(0, -1))
+            self.image = pygame.transform.rotate(self.original_droplet_image, angle)
+            self.rect = self.image.get_rect(center=self.hitbox.center)
             
-            blood_font = pygame.font.SysFont(None, 28)
-            blood_text = blood_font.render(f"HP: {self.blood}/{self.max_blood}", True, (250, 250, 250))  # 黃色金額
-            screen.blit(blood_text, (20, 40))  # 左上角座標
+            speed = 3
+            self.pos_vector.x += move_vector.x * speed
+            self.hitbox.centerx = round(self.pos_vector.x)
+            for wall in walls:
+                if self.hitbox.colliderect(wall.rect):
+                    if move_vector.x > 0: self.hitbox.right = wall.rect.left
+                    elif move_vector.x < 0: self.hitbox.left = wall.rect.right
+                    self.pos_vector.x = self.hitbox.centerx
+            
+            self.pos_vector.y += move_vector.y * speed
+            self.hitbox.centery = round(self.pos_vector.y)
+            for wall in walls:
+                if self.hitbox.colliderect(wall.rect):
+                    if move_vector.y > 0: self.hitbox.bottom = wall.rect.top
+                    elif move_vector.y < 0: self.hitbox.top = wall.rect.bottom
+                    self.pos_vector.y = self.hitbox.centery
+            
+            self.rect.center = self.hitbox.center
 
-            exp_font = pygame.font.SysFont(None, 28)
-            exp_text = exp_font.render(f"EXP: {self.exp}/1000", True, (250, 250, 250))  # 黃色金額
-            screen.blit(exp_text, (20, 60))  # 左上角座標
+    def _handle_input_level2(self, keys):
+        speed = 10
+        if keys[pygame.K_a] and self.rect.left > 0: self.rect.x -= speed
+        if keys[pygame.K_d] and self.rect.right < 800: self.rect.x += speed
+        if keys[pygame.K_w] and self.rect.top > 0: self.rect.y -= speed
+        if keys[pygame.K_s] and self.rect.bottom < 600: self.rect.y += speed
 
-    def can_move_to(self, dx, dy):
-        future_rect = self.rect.move(dx, dy)
-        for block in self.blocked_areas.get(self.current_map, []):
-            if future_rect.colliderect(block):
-                return False
-        return True
+    def _handle_input_level3(self, keys, projectile_group):
+        if keys[pygame.K_a] and self.rect.left > self.left_boundary:
+            self.rect.x -= self.move_speed
+            if self.facing_right:
+                self.facing_right = False
+                self.image = self.original_image_left
+        if keys[pygame.K_d] and self.rect.right < self.right_boundary:
+            self.rect.x += self.move_speed
+            if not self.facing_right:
+                self.facing_right = True
+                self.image = self.original_image_right
+        
+        if keys[pygame.K_SPACE] and self.on_ground:
+            self.vy = self.jump_speed
+            
+        if keys[pygame.K_j] and self.attack_cooldown == 0:
+            from weapon import Arrow
+            direction = "right" if self.facing_right else "left"
+            arrow = Arrow(self.rect.centerx, self.rect.centery, direction, damage=20)
+            if projectile_group is not None:
+                projectile_group.add(arrow)
+            self.attack_cooldown = 30
+    
+    def _update_physics_level3(self, platforms):
+        self.vy += self.gravity
+        self.rect.y += self.vy
+        self.on_ground = False
+        for platform in platforms:
+            if self.rect.colliderect(platform.rect) and self.vy > 0:
+                self.rect.bottom = platform.rect.top
+                self.vy = 0
+                self.on_ground = True
+                break
+
+    def _handle_input_lobby(self, keys):
+        speed = 10
+        if keys[pygame.K_a] and self.rect.left > -50 and self.can_move_to_dx(-speed): self.rect.x -= speed
+        if keys[pygame.K_d] and self.rect.right < 850 and self.can_move_to_dx(speed): self.rect.x += speed
+        if keys[pygame.K_w] and self.rect.top > 0 and self.can_move_to_dy(-speed): self.rect.y -= speed
+        if keys[pygame.K_s] and self.rect.bottom < 610 and self.can_move_to_dy(speed): self.rect.y += speed
+        self.check_trigger_area()
+
+    # --- Helper methods ---
+    def get_collision_rect(self):
+        shrink_ratio = 0.6
+        new_width = int(self.rect.width * shrink_ratio)
+        new_height = int(self.rect.height * shrink_ratio)
+        return pygame.Rect(self.rect.centerx - new_width / 2, self.rect.centery - new_height / 2, new_width, new_height)
+
+    def can_move_to_dx(self, dx):
+        future_rect = self.get_collision_rect().move(dx, 0)
+        return not any(future_rect.colliderect(block) for block in self.blocked_areas.get(self.current_map, []))
+
+    def can_move_to_dy(self, dy):
+        future_rect = self.get_collision_rect().move(0, dy)
+        return not any(future_rect.colliderect(block) for block in self.blocked_areas.get(self.current_map, []))
     
     def check_trigger_area(self):
         self.current_trigger_info = None
         if self.current_map == "lobby":
             for area in self.trigger_areas:
                 if area["rect"].collidepoint(self.rect.center):
-                    self.current_trigger_info = {"message": area["message"], "pos": area["pos"]}
+                    self.current_trigger_info = {"message": area["message"], "pos": area["pos"], "target": area["target"]}
                     break
+    
     def check_portal_trigger(self, event):
         if self.current_map == "lobby" and event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN:
-            for area in self.trigger_areas:
-                if area["rect"].collidepoint(self.rect.center):
-                    return area.get("target")
-        return False
-    def reset_image(self):
-        self.image = pygame.image.load(self.original_image_path).convert_alpha()
-        self.image = pygame.transform.scale(self.image, self.image_size)
-        center = self.rect.center
-        self.rect = self.image.get_rect()
-        self.rect.center = center
+            if self.current_trigger_info:
+                return self.current_trigger_info.get("target")
+        return None
 
     def resize_image(self, size):
         self.image = pygame.transform.scale(self.image, size)
-        center = self.rect.center
-        self.rect = self.image.get_rect()
-        self.rect.center = center
+        self.rect = self.image.get_rect(center=self.rect.center)
         
-    def update(self):
-    # 更新所有計時器
-        if self.attack_cooldown > 0:
-            self.attack_cooldown -= 1
-        if self.invincible_timer > 0:
-            self.invincible_timer -= 1
-
+    def reset_image(self):
+        self.image = pygame.image.load(self.original_image_path).convert_alpha()
+        self.resize_image(self.image_size)
+    
+    # --- Data methods ---
     def to_dict(self):
         return {
-            "image_path": self.original_image_path,
-            "position": self.rect.center,
-            "image_size": self.image_size,
-            "current_map": self.current_map,
-            "money": self.money,
-            "max_blood": self.max_blood,
-            "blood": self.blood,
-            "exp": self.exp
+            "image_path": self.original_image_path, "position": self.rect.center,
+            "image_size": self.image_size, "current_map": self.current_map,
+            "money": self.money, "max_blood": self.max_blood,
+            "blood": self.blood, "exp": self.exp
         }
 
     @classmethod
