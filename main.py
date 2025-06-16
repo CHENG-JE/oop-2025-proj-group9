@@ -96,7 +96,7 @@ while running:
             is_paused = False
         elif action == "leave":
             current_player.set_level_mode("game_map")
-            current_player.rect.center = (420, 180)
+            current_player.rect.center = (390, 290)
             is_paused = False
     else:
         current_player.update(platforms=level3_game.platform_group)
@@ -139,7 +139,7 @@ while running:
                     level3_game.init_level3(current_player)
                     current_player.set_level_mode("level3", boundaries=(50, 750))
         
-        elif current_player.current_map == "level1":
+        elif current_player.current_map == "level1":    
             game_status = level1_game.update_level1(screen, current_player, keys)
         
         elif current_player.current_map == "level2":
