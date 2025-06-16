@@ -1,4 +1,4 @@
-# player.py (最終修正版)
+# player.py (修正版)
 import pygame
 import ui
 import math
@@ -12,7 +12,7 @@ class Player:
         self.image = pygame.transform.scale(self.image, size)
         self.rect = self.image.get_rect(center=position)
         
-        # --- 遊戲狀態 (保留您原始的數值) ---
+        # --- 遊戲狀態 ---
         self.current_map = "lobby"
         self.money = 500
         self.max_blood = 100
@@ -22,18 +22,15 @@ class Player:
         # --- 行為與狀態控制 ---
         self.facing_right = True
         self.attack_cooldown = 0
-        self.invincible_timer = 0 # Level 3 需要此計時器，但不由通用方法控制
-        self.shoot_timer = 0      # for Level 2
-        self.kills = 0            # for Level 2
+        self.invincible_timer = 0
+        self.shoot_timer = 0
+        self.kills = 0
         self.map_initialized = {"lobby": False, "game_map": False}
 
         # --- 各關卡專用物理屬性 ---
-        # Level 1 (Droplet)
         self.original_droplet_image = None
         self.pos_vector = pygame.math.Vector2(position)
         self.hitbox = pygame.Rect(0, 0, 16, 16)
-        
-        # Level 3 (Archer)
         self.vy = 0
         self.on_ground = False
         self.gravity = 0.87
@@ -58,20 +55,26 @@ class Player:
         self.current_map = level_name
         
         if level_name == "level1":
-            self.original_droplet_image = pygame.image.load("assets/player/droplet.png").convert_alpha()
-            self.image = pygame.transform.scale(self.original_droplet_image, (34, 17))
+            # === 修正：確保 self.original_droplet_image 是縮小後的版本 ===
+            loaded_image = pygame.image.load("assets/player/droplet.png").convert_alpha()
+            self.original_droplet_image = pygame.transform.scale(loaded_image, (34, 17))
+            self.image = self.original_droplet_image.copy() # 使用副本作為當前圖像
+            
             self.rect = self.image.get_rect(center=(400, 300))
             self.pos_vector = pygame.math.Vector2(self.rect.center)
             self.hitbox.center = self.rect.center
+            self.image_size = (34, 17)
         
         elif level_name == "level2":
             self.image = pygame.image.load("assets/player/fighter.png").convert_alpha()
-            self.resize_image((100, 100))
+            self.image_size = (100, 100)
+            self.resize_image(self.image_size)
             self.rect.center = (400, 500)
 
         elif level_name == "level3":
             archer_img = pygame.image.load("assets/player/archer.png").convert_alpha()
-            self.original_image_right = pygame.transform.scale(archer_img, (120, 120))
+            self.image_size = (120, 120)
+            self.original_image_right = pygame.transform.scale(archer_img, self.image_size)
             self.original_image_left = pygame.transform.flip(self.original_image_right, True, False)
             self.image = self.original_image_right
             self.rect = self.image.get_rect(midbottom=(250, 500))
@@ -79,15 +82,14 @@ class Player:
             self.vy = 0
             self.on_ground = False
 
-        else:
+        else: # Lobby / Game Map
+            self.image_size = (150, 150)
             self.reset_image()
 
     def update(self, **kwargs):
-        # 更新所有計時器
         if self.attack_cooldown > 0: self.attack_cooldown -= 1
         if self.invincible_timer > 0: self.invincible_timer -= 1
         
-        # 只在 Level 3 執行獨立的物理更新
         if self.current_map == "level3":
             self._update_physics_level3(kwargs.get('platforms', []))
 
@@ -104,19 +106,16 @@ class Player:
             self._handle_input_lobby(keys)
 
     def draw(self, screen):
-        # Level 3 受傷時會有閃爍效果
         if self.current_map == 'level3' and self.invincible_timer > 0 and self.invincible_timer % 10 < 5:
-            pass # 透過不繪製來達成閃爍
+            pass
         else:
             screen.blit(self.image, self.rect)
 
-        # 只在 Lobby 繪製觸發提示
         if self.current_map == "lobby" and self.current_trigger_info:
             font = pygame.font.SysFont(None, 40)
             text = font.render(self.current_trigger_info["message"], True, (220, 220, 220))
             screen.blit(text, self.current_trigger_info["pos"])
 
-    # --- 各關卡的處理邏輯 ---
     def _handle_input_level1(self, keys, walls):
         move_vector = pygame.math.Vector2(0, 0)
         if keys[pygame.K_w]: move_vector.y = -1
@@ -198,7 +197,6 @@ class Player:
         if keys[pygame.K_s] and self.rect.bottom < 610 and self.can_move_to_dy(speed): self.rect.y += speed
         self.check_trigger_area()
 
-    # --- Helper methods ---
     def get_collision_rect(self):
         shrink_ratio = 0.6
         new_width = int(self.rect.width * shrink_ratio)
@@ -235,14 +233,11 @@ class Player:
         self.image = pygame.image.load(self.original_image_path).convert_alpha()
         self.resize_image(self.image_size)
     
-    # --- Data methods ---
+    def take_damage(self, amount):
+        self.blood = max(0, self.blood - amount)
+
     def to_dict(self):
-        return {
-            "image_path": self.original_image_path, "position": self.rect.center,
-            "image_size": self.image_size, "current_map": self.current_map,
-            "money": self.money, "max_blood": self.max_blood,
-            "blood": self.blood, "exp": self.exp
-        }
+        return { "image_path": self.original_image_path, "position": self.rect.center, "image_size": self.image_size, "current_map": self.current_map, "money": self.money, "max_blood": self.max_blood, "blood": self.blood, "exp": self.exp }
 
     @classmethod
     def from_dict(cls, data):
