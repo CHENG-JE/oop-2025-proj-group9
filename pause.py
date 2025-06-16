@@ -19,14 +19,14 @@ BUTTON_RECTS = [pygame.Rect(270, 140 + i * 80, 260, 50) for i in range(len(BUTTO
 RULES = {
     "level1": [
         "W/A/S/D: Move Up/Left/Down/Right",
-        "Goal: Reach the portal within 6 seconds.",
+        "Goal: Reach the portal within 12 seconds.",
         "The maze resets every round, ",
         "and you will be struck by lightning."
     ],
     "level2": [
         "W/A/S/D: Move Up/Left/Down/Right",
         "Goal: Defeat 40 enemy planes.",
-        "Bonus: Heal 50 HP for every 10 kills.",
+        "Bonus: Heal 20 HP for every 10 kills.",
         "Defeated enemies may drop items that grant EXP."
     ],
     "level3": [
