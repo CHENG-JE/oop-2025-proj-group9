@@ -15,8 +15,7 @@ from .lightning import Lightning
 SCREEN_WIDTH, SCREEN_HEIGHT = 800, 600
 GRID_WIDTH, GRID_HEIGHT = 20, 15
 CELL_SIZE = SCREEN_WIDTH // GRID_WIDTH
-# === 修正：回合時間從 6 秒延長至 12 秒 ===
-ROUND_DURATION = 12 * 60 
+ROUND_DURATION = 15 * 60 
 
 # === 全域物件 ===
 wall_group = pygame.sprite.Group()
@@ -79,6 +78,17 @@ def generate_maze():
             stack.append((nx, ny))
         else:
             stack.pop()
+            
+    # === 修正：強制建立邊界牆壁 ===
+    # 上下邊界
+    for x in range(GRID_WIDTH):
+        h_walls[0][x] = True
+        h_walls[GRID_HEIGHT][x] = True
+    # 左右邊界
+    for y in range(GRID_HEIGHT):
+        v_walls[y][0] = True
+        v_walls[y][GRID_WIDTH] = True
+        
     return h_walls, v_walls
 
 def create_walls_from_grid(h_walls, v_walls):
@@ -124,7 +134,9 @@ def update_level1(screen, main_player, keys):
     if main_player.blood <= 0:
         win_or_lose.display(screen, main_player, False, "level1")
         return "game_over"
-    if portal and pygame.sprite.collide_rect(main_player, portal):
+        
+    # === 修正：改用 hitbox 進行碰撞判斷 ===
+    if portal and portal.rect.colliderect(main_player.hitbox):
         win_or_lose.display(screen, main_player, True, "level1")
         return "game_over"
     
@@ -147,7 +159,6 @@ def update_level1(screen, main_player, keys):
     lightning_group.draw(screen)
     
     ui.draw_player_stats(screen, main_player)
-    # === 修正：將 maze_timer 傳遞給 HUD 函式 ===
     ui.draw_level_hud(screen, "level1", round_count=round_count, time_left=maze_timer)
     
     return None
