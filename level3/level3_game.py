@@ -75,10 +75,12 @@ def update_level3(screen, main_player, keys):
     if main_player.invincible_timer == 0:
         if pygame.sprite.spritecollide(main_player, monster_projectile_group, True):
             main_player.take_damage(50)
+            main_player.invincible_timer = INVINCIBLE_DURATION
         
         wave_hits = pygame.sprite.spritecollide(main_player, monster_effect_group, True)
         if wave_hits:
             main_player.take_damage(wave_hits[0].damage)
+            main_player.invincible_timer = INVINCIBLE_DURATION
 
     # --- 繪製所有內容 ---
     screen.blit(lev3_bg, (0, 0))
