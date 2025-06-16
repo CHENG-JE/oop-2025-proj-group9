@@ -170,7 +170,7 @@ class Player:
         if keys[pygame.K_SPACE] and self.on_ground:
             self.vy = self.jump_speed
             
-        if keys[pygame.K_j] and self.attack_cooldown == 0:
+        if keys[pygame.K_RETURN] and self.attack_cooldown == 0:
             from weapon import Arrow
             direction = "right" if self.facing_right else "left"
             arrow = Arrow(self.rect.centerx, self.rect.centery, direction, damage=20)
