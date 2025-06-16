@@ -17,23 +17,20 @@ def display(screen, main_player, win, level_name):
     if win:
         text1 = font_large.render("You Win!", True, (0, 255, 0))
         if level_name == "level1":
-            # === 修正：移除對 droplet 的依賴 ===
             text2_str = "You got $100 & 20 EXP"
             main_player.money += 100
             main_player.exp += 20
-            # main_player 的血量就是最終血量，不需再同步
             level_return_pos = (120, 490)
         elif level_name == "level2":
             text2_str = "You got $1000 & 100 EXP"
-            main_player.money += 1000
+            main_player.money += 500
             if main_player.exp <= 900: main_player.exp += 100
             else: main_player.exp = 1000
             level_return_pos = (445, 125)
         elif level_name == "level3":
             # === 修正：移除對 archer 的依賴 ===
             text2_str = "You got $500"
-            main_player.money += 500
-            # main_player 的血量就是最終血量，不需再同步
+            main_player.money += 1000
             level_return_pos = (660, 110)
             
     else: # 失敗
@@ -48,7 +45,8 @@ def display(screen, main_player, win, level_name):
             main_player.exp = 0
             level_return_pos = (460, 170)
         elif level_name == "level3":
-            text2_str = "You lose $300"
+            text2_str = "You lose $300 & 200 EXP"
+            main_player.exp = max(0, main_player.exp - 200)
             main_player.money = max(0, main_player.money - 300)
             level_return_pos = (660, 110)
         
