@@ -33,8 +33,8 @@ class Player:
         self.hitbox = pygame.Rect(0, 0, 16, 16)
         self.vy = 0
         self.on_ground = False
-        self.gravity = 0.9
-        self.jump_speed = -20
+        self.gravity = 0.4
+        self.jump_speed = -14
         self.move_speed = 7
         self.original_image_right = self.image
         self.original_image_left = pygame.transform.flip(self.image, True, False)
