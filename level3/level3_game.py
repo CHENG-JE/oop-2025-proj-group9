@@ -15,7 +15,7 @@ def show_game_title(screen):
     screen.fill((0, 0, 0))
     screen.blit(text_surface, text_rect)
     pygame.display.flip()
-    pygame.time.delay(5000)
+    pygame.time.delay(3000)
 
 # === 常數區 ===
 SCREEN_WIDTH = 800
