@@ -18,17 +18,17 @@
     {
         "image_path": "assets/player/player2.png",
         "position": [
-            730,
-            435
+            690,
+            425
         ],
         "image_size": [
             150,
             150
         ],
         "current_map": "lobby",
-        "money": 70,
+        "money": 670,
         "max_blood": 1380,
-        "blood": 1260,
+        "blood": 800,
         "exp": 1000
     }
 ]
