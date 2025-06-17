@@ -15,6 +15,17 @@ SHOOT_COOLDOWN = 15
 ENEMY_SPAWN_RATE = 100
 DROP_CHANCE = 0.4
 
+
+# === 顯示遊戲標題畫面 ===
+def show_game_title(screen):
+    font = pygame.font.SysFont("arial", 64)
+    text_surface = font.render("BATTLE FIGHTER BLITZ!", True, (255, 255, 255))
+    text_rect = text_surface.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2))
+    screen.fill((0, 0, 0))
+    screen.blit(text_surface, text_rect)
+    pygame.display.flip()
+    pygame.time.delay(3000)  # 等待3秒
+
 # === 全域物件 ===
 enemy_group = pygame.sprite.Group()
 laser_group = pygame.sprite.Group()
@@ -27,6 +38,7 @@ lev2_bg = pygame.transform.scale(lev2_map, (SCREEN_WIDTH, SCREEN_HEIGHT))
 
 # === 初始化 level2 ===
 def init_level2(player):
+    show_game_title(pygame.display.get_surface())
     player.shoot_timer = 0
     player.kills = 0
     enemy_group.empty()

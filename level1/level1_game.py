@@ -28,6 +28,15 @@ round_count = 1
 maze_timer = 0
 lev1_bg = pygame.transform.scale(pygame.image.load("assets/background/level1.jpeg"), (SCREEN_WIDTH, SCREEN_HEIGHT))
 
+def show_game_title(screen):
+    font = pygame.font.SysFont("arial", 64)
+    text_surface = font.render("Moving Maze!", True, (255, 255, 255))
+    text_rect = text_surface.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2))
+    screen.fill((0, 0, 0))
+    screen.blit(text_surface, text_rect)
+    pygame.display.flip()
+    pygame.time.delay(3000)  # 等待3秒
+
 def setup_new_round(main_player):
     """建立一個全新的迷宮，並重新生成傳送門"""
     h_walls, v_walls = generate_maze()
@@ -120,6 +129,11 @@ def spawn_portal():
         portal_group.add(portal)
 
 def init_level1(main_player):
+    show_game_title(pygame.display.get_surface())
+
+    main_player.shoot_timer = 0
+
+
     global round_count, maze_timer, portal
     portal = None
     for group in [wall_group, portal_group, lightning_group]: group.empty()

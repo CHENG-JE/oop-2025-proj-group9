@@ -2,7 +2,7 @@
     {
         "image_path": "assets/player/player1.png",
         "position": [
-            740,
+            730,
             425
         ],
         "image_size": [
@@ -10,25 +10,25 @@
             150
         ],
         "current_map": "lobby",
-        "money": 300,
+        "money": 0,
         "max_blood": 1380,
         "blood": 160,
-        "exp": 450
+        "exp": 570
     },
     {
         "image_path": "assets/player/player2.png",
         "position": [
-            750,
-            465
+            690,
+            425
         ],
         "image_size": [
             150,
             150
         ],
         "current_map": "lobby",
-        "money": 1570,
+        "money": 670,
         "max_blood": 1380,
-        "blood": 1060,
+        "blood": 800,
         "exp": 1000
     }
 ]

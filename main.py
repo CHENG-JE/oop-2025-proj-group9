@@ -96,7 +96,7 @@ while running:
             is_paused = False
         elif action == "leave":
             current_player.set_level_mode("game_map")
-            current_player.rect.center = (390, 290)
+            current_player.rect.center = (200,500)
             is_paused = False
     else:
         current_player.update(platforms=level3_game.platform_group)
