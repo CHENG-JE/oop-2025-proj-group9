@@ -1,4 +1,4 @@
-# level2/level2_game.py (還原並修正版)
+# level2/level2_game.py (修正版)
 import sys, os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 import pygame
@@ -38,7 +38,11 @@ lev2_bg = pygame.transform.scale(lev2_map, (SCREEN_WIDTH, SCREEN_HEIGHT))
 
 # === 初始化 level2 ===
 def init_level2(player):
+    
     show_game_title(pygame.display.get_surface())
+    # === 修正：重設玩家在 Level 2 的初始位置 ===
+    player.rect.center = (400, 500)
+
     player.shoot_timer = 0
     player.kills = 0
     enemy_group.empty()
@@ -92,11 +96,11 @@ def update_level2(player, screen, keys): # 接收 keys 參數
             enemy.shoot_timer = 0
         enemy.shoot_timer += 1
         if enemy.shoot_timer >= 40 and random.randint(1, 90) == 1:
-            if 20 > player.kills >=10: #fastenemy
+            if 20 > player.kills >=10:
                 laser = Laser(enemy.rect.centerx, enemy.rect.bottom, "down", 8, (255,255,255,180), 5, 30, 20)
-            elif player.kills >=20: #spaceship
+            elif player.kills >=20:
                 laser = Laser(enemy.rect.centerx, enemy.rect.bottom, "down", 1.5, (255,255,255,180), 5, 30, 5)
-            else: #basic
+            else:
                 laser = Laser(enemy.rect.centerx, enemy.rect.bottom, "down", 4, (255,255,255,180), 5, 30, 10)
             enemy_lasers.add(laser)
             enemy.shoot_timer = 0
@@ -145,7 +149,7 @@ def update_level2(player, screen, keys): # 接收 keys 參數
     for item in pickups:
         if item.image.get_at((0, 0))[:3] == (255, 255, 0):  # 黃色：加經驗值
             player.exp += 10
-        elif item.image.get_at((0, 0))[:3] == (255, 0, 0):  # 紅色：回血
+        elif item.image.get_at((0, 0))[:3] == (255, 0, 0):
             player.blood = min(player.blood + 20, player.max_blood)
             
     # --- 繪製所有物件 ---
