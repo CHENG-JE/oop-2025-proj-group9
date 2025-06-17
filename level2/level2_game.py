@@ -24,7 +24,7 @@ def show_game_title(screen):
     screen.fill((0, 0, 0))
     screen.blit(text_surface, text_rect)
     pygame.display.flip()
-    pygame.time.delay(5000)  # 等待5秒
+    pygame.time.delay(3000)  # 等待5秒
 
 # === 全域物件 ===
 enemy_group = pygame.sprite.Group()
