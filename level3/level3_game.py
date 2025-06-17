@@ -10,7 +10,7 @@ from .monster import Monster
 
 def show_game_title(screen):
     font = pygame.font.SysFont("arial", 64)
-    text_surface = font.render("LEVEL 3 - BATTLE OF THE MONSTER", True, (255, 255, 255))
+    text_surface = font.render("BATTLE OF THE MONSTER", True, (255, 255, 255))
     text_rect = text_surface.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2))
     screen.fill((0, 0, 0))
     screen.blit(text_surface, text_rect)
