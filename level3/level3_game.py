@@ -1,4 +1,3 @@
-# level3/level3_game.py (修正版)
 import pygame
 import sys, os
 import win_or_lose
@@ -8,6 +7,15 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 from .platform import Platform
 from .monster import Monster
+
+def show_game_title(screen):
+    font = pygame.font.SysFont("arial", 64)
+    text_surface = font.render("LEVEL 3 - BATTLE OF THE MONSTER", True, (255, 255, 255))
+    text_rect = text_surface.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2))
+    screen.fill((0, 0, 0))
+    screen.blit(text_surface, text_rect)
+    pygame.display.flip()
+    pygame.time.delay(5000)
 
 # === 常數區 ===
 SCREEN_WIDTH = 800
@@ -28,6 +36,7 @@ monster = None
 lev3_bg = pygame.transform.scale(pygame.image.load("assets/background/level3.jpeg"), (SCREEN_WIDTH, SCREEN_HEIGHT))
 
 def init_level3(main_player):
+    show_game_title(pygame.display.get_surface())
     # 清空所有群組
     for group in [platform_group, enemy_group, player_projectile_group, monster_projectile_group, monster_effect_group]:
         group.empty()
