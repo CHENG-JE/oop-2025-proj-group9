@@ -2,14 +2,14 @@
     {
         "image_path": "assets/player/player1.png",
         "position": [
-            680,
-            445
+            234,
+            210
         ],
         "image_size": [
-            150,
-            150
+            34,
+            17
         ],
-        "current_map": "lobby",
+        "current_map": "level1",
         "money": 100,
         "max_blood": 1380,
         "blood": 160,
