@@ -2,8 +2,8 @@
     {
         "image_path": "assets/player/player1.png",
         "position": [
-            390,
-            290
+            190,
+            420
         ],
         "image_size": [
             150,
@@ -18,8 +18,8 @@
     {
         "image_path": "assets/player/player2.png",
         "position": [
-            390,
-            290
+            200,
+            490
         ],
         "image_size": [
             150,
