@@ -30,7 +30,7 @@ lev1_bg = pygame.transform.scale(pygame.image.load("assets/background/level1.jpe
 
 def show_game_title(screen):
     font = pygame.font.SysFont("arial", 64)
-    text_surface = font.render("BATTLE FIGHTER BLITZ!", True, (255, 255, 255))
+    text_surface = font.render("Moving Maze!", True, (255, 255, 255))
     text_rect = text_surface.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2))
     screen.fill((0, 0, 0))
     screen.blit(text_surface, text_rect)
