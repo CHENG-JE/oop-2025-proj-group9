@@ -35,7 +35,7 @@ def show_game_title(screen):
     screen.fill((0, 0, 0))
     screen.blit(text_surface, text_rect)
     pygame.display.flip()
-    pygame.time.delay(3000)  # 等待5秒
+    pygame.time.delay(3000)  # 等待3秒
 
 def setup_new_round(main_player):
     """建立一個全新的迷宮，並重新生成傳送門"""
