@@ -48,7 +48,7 @@ oop-2025-proj-group9/
 │   └── monster.py
 │
 ├── count_commit.py        # 分析 Git commit 數量
-└── plan.txt / message.txt # 專案規劃與資訊
+└── plan.txt               # 專案規劃與資訊
 ```
 
 ## 🧪 執行方式
