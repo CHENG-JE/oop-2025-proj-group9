@@ -23,9 +23,9 @@ oop-2025-proj-group9/
 ├── player_data.json       # 儲存玩家資料
 │
 ├── lobby/                 # 登入與大廳場景
-│   ├── log_in.py
-│   ├── game_map.py
-│   └── shop.py
+│   ├── log_in.py          # 登入介面
+│   ├── game_map.py        # 遊戲地圖
+│   └── shop.py            # 商店購買介面
 │
 ├── level1/                # 第一關
 │   ├── level1_game.py     # 第一關主程式
