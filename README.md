@@ -50,7 +50,7 @@ oop-2025-proj-group9/
 └── plan.txt               # 專案規劃與資訊
 ```
 
-## 🧪 執行方式
+## 🧪 前置作業
 ### 0. 安裝 Python
 
 若尚未安裝 Python，可依下列方式安裝：
@@ -73,6 +73,10 @@ oop-2025-proj-group9/
       ```bash
       python --version
       ```
+
+
+
+
 
 安裝完成後建議確認版本：
 ```bash
