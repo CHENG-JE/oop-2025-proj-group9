@@ -28,10 +28,10 @@ oop-2025-proj-group9/
 │   └── shop.py
 │
 ├── level1/                # 第一關
-│   ├── droplet.py
+│   ├── level1_game.py     # 第一關主程式
 │   ├── lightening.py
 │   ├── portal.py
-│   ├── level1_game.py
+│   ├── droplet.py
 │   └── wall.py
 │
 ├── level2/                # 第二關
