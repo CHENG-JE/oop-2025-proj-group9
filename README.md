@@ -10,7 +10,6 @@
 - 各類敵機與武器互動
 - 暫停功能與結局判定（pause, win_or_lose）
 - 玩家數據儲存與讀取（player_data.json）
-- 玩家數據儲存與讀取（player_data.json）
 
 ## 🏗️ 專案架構
 ```
