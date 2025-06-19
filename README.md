@@ -5,10 +5,11 @@
 
 ## 🕹️ 主要功能
 - 玩家登入與角色選擇（lobby）
-- 商店購買裝備與升級（shop.py）
+- 商店購買裝備與升級，但有小禮包藏小陷阱（shop.py）
 - 多地圖關卡切換（level1、level2、level3）
 - 各類敵機與武器互動
 - 暫停功能與結局判定（pause, win_or_lose）
+- 玩家數據儲存與讀取（player_data.json）
 - 玩家數據儲存與讀取（player_data.json）
 
 ## 🏗️ 專案架構
