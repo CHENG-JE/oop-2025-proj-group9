@@ -9,7 +9,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 from .wall import HorizontalWall, VerticalWall
 from .portal import Portal
-from .lightning import Lightning
+from .lightening import Lightning
 
 # === 常數區 ===
 SCREEN_WIDTH, SCREEN_HEIGHT = 800, 600

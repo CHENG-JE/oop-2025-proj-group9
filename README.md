@@ -1,0 +1,64 @@
+# 🎮 OOP 2025 小組專案：戰鬥機大作戰
+
+## 📖 專案簡介
+本專案為以 Python + Pygame 實作的 2D 橫向捲軸射擊遊戲。玩家可選擇角色，在不同關卡中進行戰鬥與資源管理，達成任務或挑戰敵機。
+
+## 🕹️ 主要功能
+- 玩家登入與角色選擇（lobby）
+- 商店購買裝備與升級（shop.py）
+- 多地圖關卡切換（level2、level3）
+- 各類敵機與武器互動
+- 暫停功能與結局判定（pause, win_or_lose）
+- 玩家數據儲存與讀取（player_data.json）
+
+## 🏗️ 專案架構
+```
+oop-2025-proj-group9/
+├── main.py                # 主程式進入點
+├── player.py              # 玩家邏輯
+├── weapon.py              # 武器系統
+├── ui.py                  # 使用者介面繪製
+├── pause.py               # 遊戲暫停介面
+├── win_or_lose.py         # 勝敗判定邏輯
+├── player_data.json       # 儲存玩家資料
+│
+├── lobby/                 # 登入與大廳場景
+│   ├── log_in.py
+│   ├── game_map.py
+│   └── shop.py
+│
+├── level1/                # 第一關
+│   ├── droplet.py
+│   ├── lightening.py
+│   ├── portal.py
+│   ├── level1_game.py
+│   └── wall.py
+│
+├── level2/                # 第二關
+│   ├── level2_game.py
+│   ├── basic_fighter.py
+│   ├── fast_fighter.py
+│   └── spaceship_fighter.py
+│
+├── level3/                # 第三關
+│   ├── level3_game.py
+│   ├── platform.py
+│   ├── archer.py
+│   └── monster.py
+│
+├── count_commit.py        # 分析 Git commit 數量
+└── plan.txt / message.txt # 專案規劃與資訊
+```
+
+## 🧪 執行方式
+### 1. 安裝 Python 套件
+建議使用 Python 3.10 以上版本
+
+```bash
+pip install pygame
+```
+### 2. 執行遊戲
+
+```bash
+python main.py
+```
