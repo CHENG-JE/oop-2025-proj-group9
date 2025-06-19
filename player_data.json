@@ -9,7 +9,7 @@
             150,
             150
         ],
-        "current_map": "lobby",
+        "current_map": "game_map",
         "money": 0,
         "max_blood": 1380,
         "blood": 110,

@@ -15,7 +15,7 @@ from .lightening import Lightning
 SCREEN_WIDTH, SCREEN_HEIGHT = 800, 600
 GRID_WIDTH, GRID_HEIGHT = 20, 15
 CELL_SIZE = SCREEN_WIDTH // GRID_WIDTH
-ROUND_DURATION = 15 * 60 
+ROUND_DURATION = 15 * 60
 
 # === 全域物件 ===
 wall_group = pygame.sprite.Group()
@@ -137,14 +137,16 @@ def init_level1(main_player):
     global round_count, maze_timer, portal
     portal = None
     for group in [wall_group, portal_group, lightning_group]: group.empty()
-    
+        
     round_count = 1
     maze_timer = ROUND_DURATION
 
-    # 設定玩家初始位置
-    main_player.rect.center = (100, 305)
+    # === 修正：重設玩家在 Level 1 的初始位置 ===
+    main_player.rect.center = (400, 300)
+    # 同步更新 Level 1 需要用到的 hitbox 和向量位置
     main_player.hitbox.center = main_player.rect.center
-
+    main_player.pos_vector = pygame.math.Vector2(main_player.rect.center)
+    
     setup_new_round(main_player)
 
 def update_level1(screen, main_player, keys):

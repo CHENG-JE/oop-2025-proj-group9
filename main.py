@@ -143,7 +143,6 @@ while running:
             game_status = level1_game.update_level1(screen, current_player, keys)
         
         elif current_player.current_map == "level2":
-            # === 修正：將 player 改為 current_player ===
             game_status = level2_game.update_level2(current_player, screen, keys)
             
         elif current_player.current_map == "level3":

@@ -125,16 +125,12 @@ def handle_events(event, player):
                         player.money -= price
                     player.exp += 50
                     player.exp = min(player.exp , 1000)
-                    #player.money += 1000 #需要測試時再取消註解
-                #purchase_message = f"Bought:{item_names[selected_index]}"
+
             else:
                 purchase_message = "No enough cash"
                 no_cash_sound.play()
 
             # 已根據購買項目給予效果，避免重複處理
-
-            #還差購買訊息沒補完
-            #
 
         elif event.key == pygame.K_ESCAPE:
             player.current_map = "lobby"

@@ -36,7 +36,14 @@ monster = None
 lev3_bg = pygame.transform.scale(pygame.image.load("assets/background/level3.jpeg"), (SCREEN_WIDTH, SCREEN_HEIGHT))
 
 def init_level3(main_player):
+
     show_game_title(pygame.display.get_surface())
+
+    # === 修正：重設玩家在 Level 3 的初始位置和物理狀態 ===
+    main_player.rect.midbottom = (250, 500)
+    main_player.vy = 0
+    main_player.on_ground = True
+
     # 清空所有群組
     for group in [platform_group, enemy_group, player_projectile_group, monster_projectile_group, monster_effect_group]:
         group.empty()
@@ -98,7 +105,7 @@ def update_level3(screen, main_player, keys):
     player_projectile_group.draw(screen)
     monster_projectile_group.draw(screen)
     monster_effect_group.draw(screen)
-    main_player.draw(screen) # === 修正：直接畫 main_player ===
+    main_player.draw(screen)
     
     if monster: 
         monster.draw_health_bar(screen)
