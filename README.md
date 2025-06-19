@@ -80,7 +80,7 @@ python --version
 ```
 建議版本為 Python 3.10 或以上。
 
-### 1. 安裝 Python 套件
+### 1. 安裝 Pygame 套件
 建議使用 Python 3.10 以上版本
 
 ```bash
