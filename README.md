@@ -35,13 +35,13 @@ oop-2025-proj-group9/
 │   └── wall.py
 │
 ├── level2/                # 第二關
-│   ├── level2_game.py
+│   ├── level2_game.py     # 第二關主程式
 │   ├── basic_fighter.py
 │   ├── fast_fighter.py
 │   └── spaceship_fighter.py
 │
 ├── level3/                # 第三關
-│   ├── level3_game.py
+│   ├── level3_game.py     # 第三關主程式
 │   ├── platform.py
 │   ├── archer.py
 │   └── monster.py
