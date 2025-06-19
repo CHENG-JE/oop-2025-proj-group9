@@ -51,6 +51,35 @@ oop-2025-proj-group9/
 ```
 
 ## 🧪 執行方式
+### 0. 安裝 Python
+
+若尚未安裝 Python，可依下列方式安裝：
+
+- **macOS（建議使用 Homebrew）**
+  ```bash
+  brew install python
+  ```
+
+- **Ubuntu / Debian 系統**
+  ```bash
+  sudo apt update
+  sudo apt install python3 python3-pip
+  ```
+
+- **Windows**
+  1. 前往官方網站下載安裝程式：https://www.python.org/downloads/
+  2. 安裝時請勾選「Add Python to PATH」
+  3. 安裝完成後於終端機輸入：
+      ```bash
+      python --version
+      ```
+
+安裝完成後建議確認版本：
+```bash
+python --version
+```
+建議版本為 Python 3.10 或以上。
+
 ### 1. 安裝 Python 套件
 建議使用 Python 3.10 以上版本
 
