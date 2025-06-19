@@ -86,6 +86,9 @@ python --version
 ```bash
 pip install pygame
 ```
+```bash
+pip pygame --version 
+```
 ### 2. 執行遊戲(開音效)
 
 ```bash
