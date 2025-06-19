@@ -20,7 +20,7 @@ oop-2025-proj-group9/
 ├── ui.py                  # 使用者介面繪製
 ├── pause.py               # 遊戲暫停介面
 ├── win_or_lose.py         # 勝敗判定邏輯
-├── player_data.json       # 儲存玩家資料
+├── player_data.json       # 儲存+導入玩家資料
 │
 ├── lobby/                 # 登入與大廳場景
 │   ├── log_in.py          # 登入介面
