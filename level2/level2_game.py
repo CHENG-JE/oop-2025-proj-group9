@@ -18,7 +18,7 @@ DROP_CHANCE = 0.4
 
 # === 顯示遊戲標題畫面 ===
 def show_game_title(screen):
-    font = pygame.font.SysFont("arial", 64)
+    font = pygame.font.SysFont("arial", 50)
     text_surface = font.render("BATTLE FIGHTER BLITZ!", True, (255, 255, 255))
     text_rect = text_surface.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2))
     screen.fill((0, 0, 0))
